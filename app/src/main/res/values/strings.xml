@@ -32,6 +32,6 @@
     <string name="profilePicture">Profile Picture</string>
     <string name="APIKey" translatable="false">AIzaSyDEBgSaAwPsUJmPl274Cvfg6-8iP7buMDY</string>
     <string name="search_here">Search Here</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Book4Thought</string>
     <string name="sign_in">Sign In</string>
 </resources>

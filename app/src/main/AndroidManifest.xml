@@ -17,7 +17,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
+            android:label="@string/title_activity_login"
+            android:parentActivityName="com.exams.anthopoulos.book4thought.MainActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"

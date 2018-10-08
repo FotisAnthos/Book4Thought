@@ -2,6 +2,9 @@ package com.exams.anthopoulos.book4thought;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -27,6 +31,8 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.InputStream;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -36,26 +42,38 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private ProgressDialog dialog;
     private GoogleSignInClient mGoogleSignInClient;
+    private Bitmap profilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        View view = findViewById(R.id.nav_view);
-
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // [START configure_signin]
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
+                .build();
+        // [END configure_signin]
+        // [START build_client]
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        // [END build_client]
     }
 
     @Override
@@ -69,6 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     public void updateUI(GoogleSignInAccount account){
         Menu menu = navigationView.getMenu();
+        ImageView profileImage = navigationView.getHeaderView(0).findViewById(R.id.navProfileImage);
         TextView userName = navigationView.getHeaderView(0).findViewById(R.id.navProfileUsername);
         TextView email = navigationView.getHeaderView(0).findViewById(R.id.navProfileMail);
 
@@ -79,6 +98,15 @@ public class MainActivity extends AppCompatActivity
 
             userName.setText(account.getDisplayName());
             email.setText(account.getEmail());
+            if(profilePicture != null){
+                profileImage.setImageBitmap(profilePicture);
+                profileImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            }
+            else {
+                if(account.getPhotoUrl() != null) {
+                    new DownloadImageTask(profileImage).execute(account.getPhotoUrl().toString());
+                }
+            }
         }
         else{
             menu.findItem(R.id.nav_signIn).setVisible(true);
@@ -87,13 +115,14 @@ public class MainActivity extends AppCompatActivity
 
             userName.setText(R.string.app_name);
             email.setText(R.string.noString);
+            profileImage.setImageResource(R.mipmap.ic_launcher_round);
         }
 
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -128,11 +157,12 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")    //TODO remove this when done
+
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        int id;
+        id = item.getItemId();
 
         if (id == R.id.nav_signIn) {
             signIn();
@@ -144,32 +174,16 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, LoginActivity.class));
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     private void signIn() {
-        // [START configure_signin]
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
-                .build();
-        // [END configure_signin]
-        // [START build_client]
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        // [END build_client]
-
         dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
-
     }
 
     @Override
@@ -232,6 +246,7 @@ public class MainActivity extends AppCompatActivity
     // [START revokeAccess]
     private void revokeAccessGoogle() {
         dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
+        profilePicture = null;
         mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
@@ -244,6 +259,51 @@ public class MainActivity extends AppCompatActivity
                 });
     }
     // [END revokeAccess]
+
+    private void savePicture(Bitmap bm){
+        profilePicture = bm;
+    }
+
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        protected DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            profilePicture = result;
+            bmImage.setImageBitmap(result);
+            bmImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        }
+
+        protected final void publishProgress (Bitmap bmBitmap){
+
+        }
+
+    }
+
+    public void onClick(View v) {
+        Log.e(TAG, String.valueOf(v.getId()));
+        if(v.getId() == R.id.action_search){
+            Log.e(TAG, "Search!");
+        }
+
+    }
 
 
 }
