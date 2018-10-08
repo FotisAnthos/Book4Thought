@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -260,10 +259,7 @@ public class MainActivity extends AppCompatActivity
     }
     // [END revokeAccess]
 
-    private void savePicture(Bitmap bm){
-        profilePicture = bm;
-    }
-
+    
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
@@ -290,19 +286,6 @@ public class MainActivity extends AppCompatActivity
             bmImage.setImageBitmap(result);
             bmImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         }
-
-        protected final void publishProgress (Bitmap bmBitmap){
-
-        }
-
-    }
-
-    public void onClick(View v) {
-        Log.e(TAG, String.valueOf(v.getId()));
-        if(v.getId() == R.id.action_search){
-            Log.e(TAG, "Search!");
-        }
-
     }
 
 
