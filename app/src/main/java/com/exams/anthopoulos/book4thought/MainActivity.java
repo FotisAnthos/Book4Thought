@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog dialog;
     private GoogleSignInClient mGoogleSignInClient;
     private Bitmap profilePicture;
-    private FragmentTransaction transaction;
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +87,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         //main fragment initialization
         MainFragment mainFragment = new MainFragment();
         // In case this activity was started with special instructions from an
         // Intent, pass the Intent's extras to the fragment as arguments
         mainFragment.setArguments(getIntent().getExtras());
-        transaction.add(R.id.fragment_container, mainFragment).commit();
+        transaction.add(R.id.fragment_container, mainFragment, "MainFragment").commit();
     }
 
     @Override
@@ -149,10 +151,35 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        }else{
+            MainFragment fragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("MainFragment");
+            if (fragment != null && fragment.isVisible()) {
+                if (doubleBackToExitPressedOnce) {
+                    super.onBackPressed();
+                    return;
+                } else {
+                    doubleBackToExitPressedOnce = true;
+                    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            doubleBackToExitPressedOnce = false;
+                        }
+                    }, 2000);
+                }
+            }
+
+            else{
+                super.onBackPressed();
+            }
         }
-    }
+
+
+        }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,8 +194,12 @@ public class MainActivity extends AppCompatActivity
                 new SearchTask(getBaseContext()).execute(query);
                 // Replace whatever is in the fragment_container view with this fragment,
                 // and add the transaction to the back stack so the user can navigate back
-                SearchResultsFragment srf = new SearchResultsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, srf).commit();
+                SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, searchResultsFragment, "SearchResultsFragment")
+                        .addToBackStack(null)
+                        .commit();
+
                 //The listener can override the standard behavior by returning true
                 // to indicate that it has handled the submit request.
                 return true;
@@ -305,4 +336,6 @@ public class MainActivity extends AppCompatActivity
                 });
     }
     // [END revokeAccess]
+
+
 }
