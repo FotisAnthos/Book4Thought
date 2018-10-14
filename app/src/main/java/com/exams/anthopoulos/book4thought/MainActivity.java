@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
+                .requestEmail()//
                 .requestProfile()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
                 .build();
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //Fragment initialization - start with the MainFragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         //main fragment initialization
         MainFragment mainFragment = new MainFragment();
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         account = GoogleSignIn.getLastSignedInAccount(this);
+        //update the UI accordingly
         updateUI(account);
     }
 
@@ -118,11 +120,12 @@ public class MainActivity extends AppCompatActivity
 
             userName.setText(account.getDisplayName());
             email.setText(account.getEmail());
-            if(profilePicture != null){
+
+            if(profilePicture != null){//if the profilePicture is locally available
                 profileImage.setImageBitmap(profilePicture);
                 profileImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             }
-            else {//if not signed in
+            else {//else if not locally available start download task
                 if(account.getPhotoUrl() != null) {
                     DownloadImageTask DIT = new DownloadImageTask(profileImage, new DownloadImageTask.AsyncResponse(){
                         @Override
@@ -149,41 +152,40 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+
+        //if the drawer is open, close it
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }else{
+        }else {
+            //else if the current fragment is the "MainFragment"
             MainFragment fragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("MainFragment");
             if (fragment != null && fragment.isVisible()) {
                 if (doubleBackToExitPressedOnce) {
+                    //if back button has already been pressed once
                     super.onBackPressed();
                     return;
                 } else {
+                    //update back button is already pressed once(revert to not pressed after 2secs)
                     doubleBackToExitPressedOnce = true;
                     Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
                     new Handler().postDelayed(new Runnable() {
-
                         @Override
                         public void run() {
                             doubleBackToExitPressedOnce = false;
                         }
-                    }, 2000);
+                    }, 2000);//execute (order 65) after 2secs
                 }
-            }
-
-            else{
+            } else {
+                //if there any other fragment is the current one(and the drawer is closed), go back
                 super.onBackPressed();
             }
         }
-
-
-        }
-
-
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
@@ -199,7 +201,7 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragment_container, searchResultsFragment, "SearchResultsFragment")
                         .addToBackStack(null)
                         .commit();
-
+                //TODO implement the fragment transition differently, maybe after the search results are available
                 //The listener can override the standard behavior by returning true
                 // to indicate that it has handled the submit request.
                 return true;
@@ -216,8 +218,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -233,7 +233,6 @@ public class MainActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -274,7 +273,7 @@ public class MainActivity extends AppCompatActivity
             handleSignInResult(task);
         }
         else{
-            Log.w(TAG, "onActivityResult: requestCode != RC_SIGN_IN");
+            Log.e(TAG, "onActivityResult: requestCode != RC_SIGN_IN");
         }
     }
 
@@ -304,23 +303,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // [START signOut]
     private void signOutGoogle() {
         dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // [START_EXCLUDE]
                         dialog.dismiss();
                         updateUI(null);
-                        // [END_EXCLUDE]
                     }
                 });
     }
-    // [END signOut]
 
-    // [START revokeAccess]
     private void revokeAccessGoogle() {
         dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
         profilePicture = null;
@@ -328,14 +322,10 @@ public class MainActivity extends AppCompatActivity
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // [START_EXCLUDE]
                         dialog.dismiss();
                         updateUI(null);
-                        // [END_EXCLUDE]
                     }
                 });
     }
-    // [END revokeAccess]
-
 
 }

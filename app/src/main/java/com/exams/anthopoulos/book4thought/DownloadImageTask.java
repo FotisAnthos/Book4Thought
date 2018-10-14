@@ -18,15 +18,16 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
     public AsyncResponse response = null;
 
     protected DownloadImageTask(ImageView bmImage, AsyncResponse response) {
+        //Download task initialized
         this.bmImage = bmImage;
         this.response = response;
     }
 
     protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
+        String urlDisplay = urls[0];
         Bitmap mIcon11 = null;
         try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
+            InputStream in = new java.net.URL(urlDisplay).openStream();
             mIcon11 = BitmapFactory.decodeStream(in);
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
