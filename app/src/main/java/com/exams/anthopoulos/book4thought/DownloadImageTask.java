@@ -11,8 +11,9 @@ import java.io.InputStream;
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
 
     public interface AsyncResponse {
-        void processFinish(Bitmap output);
+        void imageDownloadFinish(Bitmap output);
     }
+
     private static final String TAG = "DownloadImageTaskTag";
     private ImageView bmImage;
     public AsyncResponse response = null;
@@ -41,7 +42,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
             bmImage.setImageBitmap(result);
             bmImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         }
-        response.processFinish(result);
+        response.imageDownloadFinish(result);
     }
 }
 

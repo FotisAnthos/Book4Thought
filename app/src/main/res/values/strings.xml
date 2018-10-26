@@ -35,6 +35,10 @@
     <string name="sign_in">Sign In</string>
     <string name="google_Books_API" translatable="false">https://www.googleapis.com/books/v1/</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Main Fragment View</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="book_thumbnail">Thumbnail</string>
+    <string name="book_title">Title</string>
+    <string name="book_author">Author</string>
+    <string name="description">Description</string>
 </resources>

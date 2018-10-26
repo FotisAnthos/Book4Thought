@@ -4,14 +4,23 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 
 import javax.net.ssl.HttpsURLConnection;
 
-class SearchTask extends AsyncTask<String, Void, String> {
+class SearchTask extends AsyncTask<String, Void, JSONObject> {
+
+    public interface AsyncResponse {
+        void searchFinish(JSONObject output);
+    }
 
     private static final String TAG = "SearchTaskTag";
     private final String USER_AGENT = "Mozilla/5.0";
@@ -19,13 +28,15 @@ class SearchTask extends AsyncTask<String, Void, String> {
     private String[] name = {"query", "intitle", "inauthor", "inpublisher", "subject", "isbn", "lccn", "oclc"};
     private String[] value = new String[8];
     private int length;
+    public AsyncResponse response = null;
 
-    public SearchTask(Context context) {
+    public SearchTask(Context context, AsyncResponse response) {
         this.context = context;
+        this.response = response;
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         this.length = strings.length;
         for (int i=0; i<this.length; i++){
             if(strings[i] != null){
@@ -33,8 +44,8 @@ class SearchTask extends AsyncTask<String, Void, String> {
             }
         }
 
-        String response = searchRequest();
-        return null;
+        JSONObject response = searchRequest();
+        return response;
     }
 
 
@@ -73,7 +84,8 @@ class SearchTask extends AsyncTask<String, Void, String> {
         return url.toString();
     }
 
-    public String searchRequest(){
+    public JSONObject searchRequest(){
+        BufferedReader bufferedReader = null;
         try {
             URL url = new URL(urlBuild());
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -82,16 +94,32 @@ class SearchTask extends AsyncTask<String, Void, String> {
 
             String responseCode = Integer.toString(connection.getResponseCode());
             Log.e(TAG, responseCode);
-            return responseCode;
+
+            bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String line;
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                stringBuffer.append(line);
+            }
+            return new JSONObject(stringBuffer.toString());
 
         } catch (MalformedURLException e) {
             Log.e(TAG, "onQueryTextSubmit-MalformedURL");
-            return "Exception";
+            return null;
         } catch (IOException e) {
             Log.e(TAG, "onQueryTextSubmit-IOException");
-            return "Exception";
+            return null;
+        } catch (JSONException e) {
+            Log.e(TAG, "onQueryTextSubmit-JSONException");
+            return null;
         }
 
+    }
+
+    protected void onPostExecute(JSONObject result) {
+        response.searchFinish(result);
     }
 
 
