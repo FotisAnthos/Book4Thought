@@ -93,7 +93,7 @@ class SearchTask extends AsyncTask<String, Void, JSONObject> {
             connection.setRequestProperty("User-Agent", USER_AGENT);
 
             String responseCode = Integer.toString(connection.getResponseCode());
-            Log.e(TAG, responseCode);
+            Log.d(TAG, responseCode);
 
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 

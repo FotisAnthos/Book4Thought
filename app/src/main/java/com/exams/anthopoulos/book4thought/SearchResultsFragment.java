@@ -10,14 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONObject;
+import java.util.List;
 
 
 public class SearchResultsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private JSONObject searchResults;
+    private List<BookData> bookList;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -26,9 +26,7 @@ public class SearchResultsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void setSearchResults(JSONObject searchResults) {
-        this.searchResults = searchResults;
-    }
+    public void setSearchResults(List<BookData> searchResults) {this.bookList = searchResults;}
 
     public static SearchResultsFragment newInstance() {
         SearchResultsFragment fragment = new SearchResultsFragment();
@@ -44,6 +42,8 @@ public class SearchResultsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+
         
     }
 
@@ -54,13 +54,11 @@ public class SearchResultsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_search_results, container, false);
 
         mRecyclerView = rootView.findViewById(R.id.search_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-
+        mAdapter = new ResultsAdapter(bookList);
+        mRecyclerView.setAdapter(mAdapter);
         mLayoutManager = new LinearLayoutManager(rootView.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new ResultsAdapter(searchResults);
-        mRecyclerView.setAdapter(mAdapter);
 
 
         return rootView;

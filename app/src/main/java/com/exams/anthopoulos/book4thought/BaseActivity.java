@@ -201,12 +201,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if(id == R.id.action_search) {
             MenuItem search = findViewById(R.id.action_search);
             search.isChecked();
@@ -239,24 +235,25 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
-        // Inflate the menu
+        // Inflate the menu //this is the search
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        SearchView searchItem = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        ((SearchView) searchItem).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        final SearchView searchItem = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchItem.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //new SearchTask(getBaseContext()).execute(query);
                 Intent search = new Intent(getBaseContext(), SearchActivity.class);
                 search.putExtra("query", query);
+                searchItem.setQuery("", false);
+                searchItem.setIconified(true);
+                searchItem.clearFocus();
                 startActivity(search);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                //TODO add suggestions
                 return false;
             }
         });
@@ -282,19 +279,15 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             if (doubleBackToExitPressedOnce) {
                 //if back button has already been pressed once
                 super.onBackPressed();
-                return;
-                }
+            }
+            else {
+                //update back button is already pressed once(revert to not pressed after 2secs)
+                doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-                else {
-                    //update back button is already pressed once(revert to not pressed after 2secs)
-                    doubleBackToExitPressedOnce = true;
-                    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
-                    new Handler().postDelayed(new Runnable() {
+                new Handler().postDelayed(new Runnable() {
                         @Override
-                        public void run() {
-                            doubleBackToExitPressedOnce = false;
-                        }
+                        public void run() { doubleBackToExitPressedOnce = false; }
                     }, 2000);//execute (order 65) after 2secs
                 }
             }
@@ -303,5 +296,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 super.onBackPressed();
             }
         }
-    }
+
+}
 

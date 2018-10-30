@@ -11,43 +11,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="16dp">
+        android:layout_margin="2dp">
 
         <LinearLayout
             android:id="@+id/results_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_container"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <ImageView
                 android:id="@+id/book_thumbnail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 android:contentDescription="@string/book_thumbnail"
                 app:srcCompat="@android:drawable/ic_menu_report_image" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/book_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/book_title" />
+                    android:gravity="center_horizontal"
+                    android:text="@string/book_title"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/book_author"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/book_author" />
+                    android:gravity="center_horizontal"
+                    android:text="@string/book_author"
+                    android:textStyle="italic" />
 
-                <TextView
-                    android:id="@+id/book_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/description" />
             </LinearLayout>
         </LinearLayout>
 
