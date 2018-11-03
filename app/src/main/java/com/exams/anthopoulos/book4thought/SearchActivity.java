@@ -10,16 +10,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends BaseActivity implements SearchResultsFragment.OnFragmentInteractionListener{
     private static final String TAG = "SearchActivityTag";
     private static final int RESULTS_LIMIT = 50;
     private JSONObject searchResults;
     private SearchResultsFragment searchResultsFragment;
+    private ArrayList<BookData> booksList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_base);
         super.onCreate(savedInstanceState);
+        booksList = new ArrayList<>();
         //Fragment initialization - start with the MainFragment
         //main fragment initialization
         MainFragment mainFragment = new MainFragment();
@@ -27,17 +29,20 @@ public class SearchActivity extends BaseActivity {
         transaction.add(R.id.fragment_container, mainFragment, "searchWaitFragment").commit();
     }
 
+
+
     @Override
     protected void onStart() {
         super.onStart();
         //get the search query and start the search
+
         String query = getIntent().getStringExtra("query");
         getSupportActionBar().setTitle(query);
         SearchTask searchTask = new SearchTask(getBaseContext(), new SearchTask.AsyncResponse() {
             @Override
             public void searchFinish(JSONObject output) {
                 searchResults = output;
-                ArrayList<BookData> booksList = new ArrayList<>();
+                booksList = new ArrayList<>();
                 try {
                     JSONArray array = searchResults.getJSONArray("items");
 
@@ -49,6 +54,7 @@ public class SearchActivity extends BaseActivity {
                         JSONObject book = array.getJSONObject(index);
                         JSONObject volumeInfo = book.getJSONObject("volumeInfo");
                         String title, description, thumbnailLink, selfLink, canonicalLink, previewLink;
+
                         title = volumeInfo.getString("title");
                         JSONArray jsAuthors = volumeInfo.getJSONArray("authors");
                         ArrayList<String> authors = new ArrayList<>();
@@ -62,8 +68,6 @@ public class SearchActivity extends BaseActivity {
                         }catch (JSONException e){
                             thumbnailLink = null;
                         }
-
-
 
                         selfLink = book.getString("selfLink");
                         canonicalLink = volumeInfo.getString("canonicalVolumeLink");
@@ -94,5 +98,10 @@ public class SearchActivity extends BaseActivity {
     public void onBackPressed() {
         getSupportActionBar().setTitle(getResources().getString(R.string.title_activity_search));
         super.onBackPressed();
+    }
+
+    @Override
+    public void onFragmentInteraction() {
+        //TODO for fragment interaction
     }
 }

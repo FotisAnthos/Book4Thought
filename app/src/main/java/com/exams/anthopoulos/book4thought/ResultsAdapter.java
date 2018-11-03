@@ -1,5 +1,6 @@
 package com.exams.anthopoulos.book4thought;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,24 +53,20 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
         holder.title.setText(bookData.getTitle());
         holder.author.setText(bookData.getAuthors().get(0));//just the first one for this view
 
-        /*
-        ImageView thumbnail = holder.thumbnail;
-
-        if(bookData.getThumbnailLink() != null) {
-            DownloadImageTask DIT = new DownloadImageTask(thumbnail, new DownloadImageTask.AsyncResponse() {
-                @Override
-                public void imageDownloadFinish(Bitmap output) {
-                    thumbnail.setImageBitmap(output);
-                }
-            });
-            DIT.execute(bookData.getThumbnailLink());
-        }
-        */
         if(bookData.getThumbnailLink() != null) {
             Picasso.get().cancelRequest(holder.thumbnail);
             Picasso.get().load(bookData.getThumbnailLink()).into(holder.thumbnail);
         }
         holder.itemView.setTag(bookData);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent displayBook = new Intent(v.getContext(), BookDisplay.class);
+                BookData bookData =  (BookData) v.getTag();
+                displayBook.putExtra("bookData", bookData);
+                v.getContext().startActivity(displayBook);
+            }
+        });
 
     }
 
@@ -78,5 +75,7 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
     public int getItemCount() {
         return bookList.size();
     }
+
+
 
 }

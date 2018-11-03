@@ -2,9 +2,11 @@ package com.exams.anthopoulos.book4thought;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SearchRecentSuggestionsProvider;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,7 +33,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "BaseActivityTag";
     private static final int RC_SIGN_IN = 9001;
@@ -239,15 +241,23 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        final SearchView searchItem = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchItem.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                //prepare the new intent
                 Intent search = new Intent(getBaseContext(), SearchActivity.class);
                 search.putExtra("query", query);
-                searchItem.setQuery("", false);
-                searchItem.setIconified(true);
-                searchItem.clearFocus();
+                //reset the searchView
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                searchView.clearFocus();
+                //save the query for future suggestions
+                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getBaseContext(),
+                        SearchSuggestionProvider.AUTHORITY,
+                        SearchSuggestionProvider.MODE);
+                suggestions.saveRecentQuery(query, null);
+                //start the new (search) activity
                 startActivity(search);
                 return true;
             }
@@ -296,6 +306,21 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 super.onBackPressed();
             }
         }
+
+
+    public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
+        // AUTHORITY is a unique name, but it is recommended to use the name of the
+        // package followed by the name of the class.
+        public final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
+
+        // Uncomment line below, if you want to provide two lines in each suggestion:
+        // public final static int MODE = DATABASE_MODE_QUERIES | DATABASE_MODE_2LINES;
+        public final static int MODE = DATABASE_MODE_QUERIES;
+
+        public SearchSuggestionProvider() {
+            setupSuggestions(AUTHORITY, MODE);
+        }
+    }
 
 }
 

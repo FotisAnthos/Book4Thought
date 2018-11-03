@@ -34,6 +34,10 @@
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".BookDisplay"
+            android:label="@string/title_activity_book_display"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

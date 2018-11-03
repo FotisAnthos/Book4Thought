@@ -30,15 +30,18 @@
     <string name="signed_out">Signed Out</string>
     <string name="noString" translatable="false" />
     <string name="profilePicture">Profile Picture</string>
-    <string name="search_here">Search Here</string>
+    <string name="search_hint">Search Here</string>
     <string name="title_activity_main" translatable="false">Book4Thought</string>
     <string name="sign_in">Sign In</string>
     <string name="google_Books_API" translatable="false">https://www.googleapis.com/books/v1/</string>
 
     <string name="hello_blank_fragment">Main Fragment View</string>
-    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_search">Search</string>
     <string name="book_thumbnail">Thumbnail</string>
     <string name="book_title">Title</string>
     <string name="book_author">Author</string>
     <string name="description">Description</string>
+    <string name="title_activity_book_display">BookDisplay</string>
+    <string name="book_description">description</string>
+    <string name="read_book">Read Book!</string>
 </resources>
