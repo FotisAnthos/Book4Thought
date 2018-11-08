@@ -25,7 +25,7 @@ import com.google.android.gms.tasks.Task;
 public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener{
 
-    private static final String TAG = "LoginActivity";
+    private static final String TAG = "LoginActivityTag";
     private ProgressDialog dialog;
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
