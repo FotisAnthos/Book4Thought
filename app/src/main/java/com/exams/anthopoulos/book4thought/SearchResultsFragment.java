@@ -51,7 +51,7 @@ public class SearchResultsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_search_results, container, false);
 
         mRecyclerView = rootView.findViewById(R.id.search_recycler_view);
-        mAdapter = new ResultsAdapter(bookList);
+        mAdapter = new ResultsAdapter(bookList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mLayoutManager = new LinearLayoutManager(rootView.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);

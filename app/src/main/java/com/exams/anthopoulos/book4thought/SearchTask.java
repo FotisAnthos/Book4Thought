@@ -28,7 +28,7 @@ class SearchTask extends AsyncTask<String, Void, JSONObject> {
     private String[] name = {"query", "intitle", "inauthor", "inpublisher", "subject", "isbn", "lccn", "oclc"};
     private String[] value = new String[8];
     private int length;
-    public AsyncResponse response = null;
+    public AsyncResponse response;
 
     public SearchTask(Context context, AsyncResponse response) {
         this.context = context;

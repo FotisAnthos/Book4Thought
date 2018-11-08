@@ -6,7 +6,6 @@ import android.content.SearchRecentSuggestionsProvider;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -174,7 +173,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             userName.setText(account.getDisplayName());
             email.setText(account.getEmail());
 
-            if(profilePicture != null){//if the profilePicture is locally available
+
+            if(profilePicture != null){//if the profilePicture is readily available
                 profileImage.setImageBitmap(profilePicture);
                 profileImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             }
@@ -252,11 +252,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 searchView.clearFocus();
-                //save the query for future suggestions
-                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getBaseContext(),
-                        SearchSuggestionProvider.AUTHORITY,
-                        SearchSuggestionProvider.MODE);
-                suggestions.saveRecentQuery(query, null);
                 //start the new (search) activity
                 startActivity(search);
                 return true;
@@ -282,7 +277,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         }
         else if( !searchItem.isIconified() ){
             searchItem.onActionViewCollapsed();
-            //TODO find a way to close the soft keyboard + collapse the search
         }
         //else if the current fragment is the "MainFragment"
         else if (mainFragment != null && mainFragment.isVisible()) {

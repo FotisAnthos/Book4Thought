@@ -37,7 +37,7 @@ public class BookDisplayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_book_display, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_book_display, container, false);
 
         ImageView thumbnail = rootView.findViewById(R.id.display_thumbnail);
         TextView title = rootView.findViewById(R.id.display_book_title);
@@ -64,6 +64,7 @@ public class BookDisplayFragment extends Fragment {
         readBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rootView.findViewById(R.id.book_display_scroll).scrollTo(0, 0);
                 mListener.onFragmentInteraction(bookData);
             }
         });
