@@ -1,13 +1,18 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.exams.anthopoulos.book4thought.BookData;
+import com.exams.anthopoulos.book4thought.R;
+import com.exams.anthopoulos.book4thought.Utilities.ResultsAdapter;
 
 import java.util.List;
 
@@ -56,6 +61,17 @@ public class SearchResultsFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         mLayoutManager = new LinearLayoutManager(rootView.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        final SwipeRefreshLayout swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // This method performs the actual data-refresh operation.
+                // The method calls setRefreshing(false) when it's finished.
+                mAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         return rootView;
     }

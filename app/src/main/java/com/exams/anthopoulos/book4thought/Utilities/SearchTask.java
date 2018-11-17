@@ -1,8 +1,10 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Utilities;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.exams.anthopoulos.book4thought.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +18,7 @@ import java.util.StringTokenizer;
 
 import javax.net.ssl.HttpsURLConnection;
 
-class SearchTask extends AsyncTask<String, Void, JSONObject> {
+public class SearchTask extends AsyncTask<String, Void, JSONObject> {
 
     public interface AsyncResponse {
         void searchFinish(JSONObject output);
@@ -80,7 +82,11 @@ class SearchTask extends AsyncTask<String, Void, JSONObject> {
                 }
             }
         }
-        //TODO add authentication for user-specific info
+
+        url.append("&orderBy=relevance");
+
+        //url.append("&key="+ BuildConfig.GOOGLE_BOOKS_API_KEY);
+        //Log.i(TAG, url.toString());
         return url.toString();
     }
 

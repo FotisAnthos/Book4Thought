@@ -48,4 +48,6 @@
     <string name="advanced_search">Advanced Search</string>
     <string name="search_for">Search For:</string>
     <string name="author">Author</string>
+    <string name="save_to_local_db">Save to Local DB</string>
+    <string name="NothingToShow">Nothing To Show</string>
 </resources>

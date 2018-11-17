@@ -1,4 +1,4 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Utilities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +16,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
 
     private static final String TAG = "DownloadImageTaskTag";
     private ImageView bmImage;
-    public AsyncResponse response = null;
+    public AsyncResponse response;
 
     protected DownloadImageTask(ImageView bmImage, AsyncResponse response) {
         //Download task initialized

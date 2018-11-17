@@ -1,50 +1,47 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.exams.anthopoulos.book4thought.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link AdvancedSearchFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link AdvancedSearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class AdvancedSearchFragment extends Fragment {
+
+public class MainFragment extends Fragment {
+    private static final String TAG = "MainFragmentTag";
+
 
     private OnFragmentInteractionListener mListener;
 
-    public AdvancedSearchFragment() {
+    public MainFragment() {
         // Required empty public constructor
     }
 
 
-    public static AdvancedSearchFragment newInstance(String param1, String param2) {
-        AdvancedSearchFragment fragment = new AdvancedSearchFragment();
+    public static MainFragment newInstance() {
+        MainFragment fragment = new MainFragment();
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setRetainInstance(true);
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_advanced_search, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
         if (mListener != null) {
             mListener.onFragmentInteraction();
         }
@@ -56,8 +53,8 @@ public class AdvancedSearchFragment extends Fragment {
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
-            //throw new RuntimeException(context.toString()
-            //        + " must implement OnFragmentInteractionListener");
+            //throw new RuntimeException(context.toString() TODO
+            //     + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -66,6 +63,7 @@ public class AdvancedSearchFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction();

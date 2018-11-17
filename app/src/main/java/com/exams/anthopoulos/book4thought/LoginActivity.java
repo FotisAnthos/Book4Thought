@@ -1,16 +1,17 @@
 package com.exams.anthopoulos.book4thought;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,10 +27,10 @@ public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener{
 
     private static final String TAG = "LoginActivityTag";
-    private ProgressDialog dialog;
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
     private static final int RC_SIGN_IN = 9001;  // The request code
+    private LoadingFragment loadingFragment;
 
 
     @Override
@@ -73,7 +74,9 @@ public class LoginActivity extends AppCompatActivity implements
     }
 
     public void signInGoogle(){
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -82,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        dialog.dismiss();
+        loadingFragment.dismiss();
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach a listener.
@@ -122,13 +125,14 @@ public class LoginActivity extends AppCompatActivity implements
 
     // [START signOut]
     private void signOutGoogle() {
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
-        mGoogleSignInClient.signOut()
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         // [START_EXCLUDE]
-                        dialog.dismiss();
+                        loadingFragment.dismiss();
                         updateUI(null);
                         // [END_EXCLUDE]
                     }
@@ -138,13 +142,14 @@ public class LoginActivity extends AppCompatActivity implements
 
     // [START revokeAccess]
     private void revokeAccessGoogle() {
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
-        mGoogleSignInClient.revokeAccess()
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         // [START_EXCLUDE]
-                        dialog.dismiss();
+                        loadingFragment.dismiss();
                         updateUI(null);
                         // [END_EXCLUDE]
                     }

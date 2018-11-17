@@ -1,4 +1,4 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Utilities;
 
 
 import android.content.Intent;
@@ -14,12 +14,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.exams.anthopoulos.book4thought.BookData;
+import com.exams.anthopoulos.book4thought.BookDisplay;
+import com.exams.anthopoulos.book4thought.Fragments.AdvancedSearchFragment;
+import com.exams.anthopoulos.book4thought.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHolder> {
+public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHolder> {
 
+    private static final String TAG = ResultsAdapter.class.getCanonicalName();
     private List<BookData> bookList;
     private FragmentActivity fragmentActivity;
 
@@ -42,9 +47,13 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
         }
     }
 
-    ResultsAdapter(List<BookData> bookList, FragmentActivity fragmentActivity) {
+    public ResultsAdapter(List<BookData> bookList, FragmentActivity fragmentActivity) {
         this.bookList = bookList;
         this.fragmentActivity = fragmentActivity;
+    }
+
+    public void setBookList(List<BookData> bookList) {
+        this.bookList = bookList;
     }
 
     @NonNull
@@ -82,6 +91,8 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
             if (bookData.getThumbnailLink() != null) {
                 Picasso.get().cancelRequest(holder.thumbnail);
                 Picasso.get().load(bookData.getThumbnailLink()).into(holder.thumbnail);
+            }else if (bookData.getThumbnail() != null){
+                holder.thumbnail.setImageBitmap(bookData.getThumbnail());
             }
             holder.itemView.setTag(bookData);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -100,12 +111,22 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
     // Return the size of your dataSet (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return bookList.size()+1; //the number of the results items +1 more view for the "advanced button"
+        try{
+            return bookList.size()+1; //the number of the results items +1 more view for the "advanced button"
+        }catch (NullPointerException npe){
+            return 1;//this means that the bookList is empty, so make the size =1 for the advanced button
+        }
+
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (position == bookList.size()) ? R.layout.advanced_search_button : R.layout.results_cardview;
+        try{
+            return (position == bookList.size()) ? R.layout.advanced_search_button : R.layout.results_cardview;
+        }catch (Exception e){
+            //if there is an exception the advanced search button is the only thing to be displayed(no data is to be displayed)
+            return R.layout.advanced_search_button;
+        }
     }
 
 

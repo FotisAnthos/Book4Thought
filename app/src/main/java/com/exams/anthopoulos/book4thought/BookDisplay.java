@@ -7,8 +7,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toast;
 
+import com.exams.anthopoulos.book4thought.Fragments.BookDisplayFragment;
 
-public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnFragmentInteractionListener{
+
+public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "BookDisplayTag";
     private BookDisplayFragment bookDisplayFragment;
@@ -21,7 +23,8 @@ public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnF
         BookData bookData = intent.getParcelableExtra("bookData");
         getSupportActionBar().setTitle(bookData.getTitle());
 
-        BookDisplayFragment bookDisplayFragment = new BookDisplayFragment();
+        bookDisplayFragment = new BookDisplayFragment();
+
         if (savedInstanceState == null) {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -60,11 +63,7 @@ public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnF
                     // Here we use an intent without a Chooser unlike the next example
                     startActivity(chooseIntent);
                 }
-
-
-
                 Toast.makeText(this, bookData.getTitle() + " not found on Play Store", Toast.LENGTH_SHORT).show();
-
             }
         }
 

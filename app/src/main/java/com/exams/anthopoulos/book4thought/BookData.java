@@ -1,5 +1,6 @@
 package com.exams.anthopoulos.book4thought;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,8 +15,10 @@ public class BookData implements Parcelable {
     private String selfLink; //a google books link to get just this specific book
     private String canonicalLink;
     private String thumbnailLink;
+    private Bitmap thumbnail;
 
-    public BookData (String title, List<String> authors, String description, String selfLink, String canonicalLink, String thumbnailLink, String previewLink) {
+
+    public BookData(String title, List<String> authors, String description, String selfLink, String canonicalLink, String thumbnailLink, String previewLink, String id) {
         this.title = title;
         this.authors = authors;
         this.description = description;
@@ -25,16 +28,23 @@ public class BookData implements Parcelable {
         this.previewLink = previewLink;
     }
 
+    //when the book is already saved
+    public BookData(String title, String author, String description, String canonicalLink, Bitmap thumbnail) {
+        this.title = title;
+        this.authors = new ArrayList<>();
+        this.authors.add(author);
+        this.description = description;
+        this.canonicalLink = canonicalLink;
+        this.thumbnail = thumbnail;
+    }
+
+
     public String getTitle() {
         return title;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public String getSelfLink() {
-        return selfLink;
     }
 
     public String getCanonicalLink() {
@@ -45,15 +55,15 @@ public class BookData implements Parcelable {
         return thumbnailLink;
     }
 
-    public String getPreviewLink() {return previewLink;}
-
     public List<String> getAuthors() {
         return authors;
     }
 
+    public Bitmap getThumbnail() {
+        return thumbnail;
+    }
 
     //Parcelable Components
-
     protected BookData(Parcel in) {
         previewLink = in.readString();
         title = in.readString();
@@ -102,4 +112,5 @@ public class BookData implements Parcelable {
             return new BookData[size];
         }
     };
+
 }
