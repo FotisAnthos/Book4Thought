@@ -5,7 +5,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
+import com.exams.anthopoulos.book4thought.Fragments.SearchResultsFragment;
+import com.exams.anthopoulos.book4thought.Utilities.SearchTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,23 +19,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends BaseActivity implements SearchResultsFragment.OnFragmentInteractionListener{
+public class SearchActivity extends BaseActivity implements SearchResultsFragment.OnFragmentInteractionListener {
     private static final String TAG = "SearchActivityTag";
     private static final int RESULTS_LIMIT = 50;
     private JSONObject searchResults;
-    private SearchResultsFragment searchResultsFragment;
     private ArrayList<BookData> booksList;
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_base);
         super.onCreate(savedInstanceState);
         booksList = new ArrayList<>();
-        //Fragment initialization - start with the MainFragment
-        //main fragment initialization
-        MainFragment mainFragment = new MainFragment();
+
+        //View initialization, show loading Fragment until results are ready to display
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.fragment_container, mainFragment, "searchWaitFragment").commit();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");
     }
 
 
@@ -40,23 +45,30 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
         //get the search query and start the search
 
         String query = getIntent().getStringExtra("query");
-        getSupportActionBar().setTitle(query);
+
+        try{
+            getSupportActionBar().setTitle(query);
+        }catch (NullPointerException npe){
+            Log.w(TAG, npe.getMessage());
+        }
 
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+        if (connectivityManager != null) {
+            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
 
-            SearchTask searchTask = new SearchTask(getBaseContext(), new SearchTask.AsyncResponse() {
-                @Override
-                public void searchFinish(JSONObject output) {
-                    searchResults = output;
-                    dataGather();
-                }
-            });
-            searchTask.execute(query);
+                SearchTask searchTask = new SearchTask(getString(R.string.google_Books_API), new SearchTask.AsyncResponse() {
+                    @Override
+                    public void searchFinish(JSONObject output) {
+                        searchResults = output;
+                        dataGather();
+                    }
+                });
+                searchTask.execute(query);
 
-        }   else {
-            Toast.makeText(this, "Not connected to the Internet!", Toast.LENGTH_LONG).show();
+            }   else {
+                Toast.makeText(this, "Not connected to the Internet!", Toast.LENGTH_LONG).show();
+            }
         }
 
 
@@ -74,7 +86,7 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
             for(int index=0; index < resultsLength; index++){//for the items listed in the json
                 JSONObject book = array.getJSONObject(index);
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
-                String title, description, thumbnailLink, selfLink, canonicalLink, previewLink;
+                String title, description, thumbnailLink, selfLink, canonicalLink, previewLink, id;
 
                 title = volumeInfo.getString("title");
                 JSONArray jsAuthors = volumeInfo.getJSONArray("authors");
@@ -106,21 +118,22 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
     }
 
     private void displayResults(List<BookData> booksList){
-        searchResultsFragment = new SearchResultsFragment();
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         searchResultsFragment.setSearchResults(booksList);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment.dismiss();//search results are ready to be displayed, dismiss the loading fragment
         transaction.replace(R.id.fragment_container, searchResultsFragment, "searchResultsFragment");
         transaction.commit();
     }
 
     @Override
     public void onBackPressed() {
-        getSupportActionBar().setTitle(getResources().getString(R.string.title_activity_search));
+        try{
+            getSupportActionBar().setTitle(getResources().getString(R.string.title_activity_search));
+        }catch (NullPointerException npe){
+            Log.w(TAG, npe.getMessage());
+        }
         super.onBackPressed();
     }
 
-    @Override
-    public void onFragmentInteraction() {
-        //TODO for fragment interaction
-    }
 }

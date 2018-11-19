@@ -1,12 +1,14 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.exams.anthopoulos.book4thought.R;
 
 
 /**
@@ -25,26 +27,19 @@ public class AdvancedSearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-    public static AdvancedSearchFragment newInstance(String param1, String param2) {
-        AdvancedSearchFragment fragment = new AdvancedSearchFragment();
-        return fragment;
+    public static AdvancedSearchFragment newInstance() {
+        return new AdvancedSearchFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_advanced_search, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
         if (mListener != null) {
             mListener.onFragmentInteraction();
         }
@@ -55,9 +50,6 @@ public class AdvancedSearchFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
-        } else {
-            //throw new RuntimeException(context.toString()
-            //        + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -67,7 +59,7 @@ public class AdvancedSearchFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
         void onFragmentInteraction();
     }
 }

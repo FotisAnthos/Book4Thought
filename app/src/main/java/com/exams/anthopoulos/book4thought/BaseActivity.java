@@ -1,13 +1,14 @@
 package com.exams.anthopoulos.book4thought;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,6 +23,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
+import com.exams.anthopoulos.book4thought.Fragments.MainFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,18 +34,20 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
 
-public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+import java.util.Objects;
+
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "BaseActivityTag";
     private static final int RC_SIGN_IN = 9001;
     private NavigationView navigationView;
     private GoogleSignInClient mGoogleSignInClient;
-    private ProgressDialog dialog;
-    private Bitmap profilePicture;
-    private GoogleSignInAccount account;
     private boolean doubleBackToExitPressedOnce = false;
     private Menu menu;
+    private LoadingFragment loadingFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,15 +85,16 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         super.onStart();
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        account = GoogleSignIn.getLastSignedInAccount(this);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         //update the UI accordingly
         updateUI(account);
     }
 
 
     private void signIn() {
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
-
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -96,7 +102,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        dialog.dismiss();
+        loadingFragment.dismiss();
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach a listener.
@@ -135,31 +141,32 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void signOutGoogle() {
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
-        mGoogleSignInClient.signOut()
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        dialog.dismiss();
+                        loadingFragment.dismiss();
                         updateUI(null);
                     }
                 });
     }
 
     private void revokeAccessGoogle() {
-        dialog = ProgressDialog.show(this, "","Loading. Please wait...", true);
-        profilePicture = null;
-        mGoogleSignInClient.revokeAccess()
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        loadingFragment = new LoadingFragment();
+        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        dialog.dismiss();
+                        loadingFragment.dismiss();
                         updateUI(null);
                     }
                 });
     }
 
-    public void updateUI(GoogleSignInAccount account){
+    private void updateUI(GoogleSignInAccount account){
         Menu menu = navigationView.getMenu();
         final ImageView profileImage = navigationView.getHeaderView(0).findViewById(R.id.navProfileImage);
         TextView userName = navigationView.getHeaderView(0).findViewById(R.id.navProfileUsername);
@@ -173,7 +180,20 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             userName.setText(account.getDisplayName());
             email.setText(account.getEmail());
 
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    String url = Objects.requireNonNull(account.getPhotoUrl()).toString();
+                    Drawable placeholder = getDrawable(R.drawable.ic_launcher_background);
+                    Picasso.get()
+                                .load(url)
+                                .placeholder(placeholder)
+                                .into(profileImage);
+                }
+            }catch (Exception e){
+                Log.w(TAG, "Could not load profile image");
+            }
 
+            /*
             if(profilePicture != null){//if the profilePicture is readily available
                 profileImage.setImageBitmap(profilePicture);
                 profileImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -189,6 +209,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                     DIT.execute(account.getPhotoUrl().toString());
                 }
             }
+            */
         }
         else{//if not signed in
             menu.findItem(R.id.nav_signIn).setVisible(true);
@@ -305,11 +326,11 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
         // AUTHORITY is a unique name, but it is recommended to use the name of the
         // package followed by the name of the class.
-        public final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
+        final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
 
         // Uncomment line below, if you want to provide two lines in each suggestion:
         // public final static int MODE = DATABASE_MODE_QUERIES | DATABASE_MODE_2LINES;
-        public final static int MODE = DATABASE_MODE_QUERIES;
+        final static int MODE = DATABASE_MODE_QUERIES;
 
         public SearchSuggestionProvider() {
             setupSuggestions(AUTHORITY, MODE);

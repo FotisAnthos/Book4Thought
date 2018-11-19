@@ -1,7 +1,10 @@
-package com.exams.anthopoulos.book4thought;
+package com.exams.anthopoulos.book4thought.Utilities;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -14,22 +17,31 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.exams.anthopoulos.book4thought.BookData;
+import com.exams.anthopoulos.book4thought.BookDisplay;
+import com.exams.anthopoulos.book4thought.Fragments.AdvancedSearchFragment;
+import com.exams.anthopoulos.book4thought.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHolder> {
+public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHolder> {
 
+    private static final String TAG = ResultsAdapter.class.getCanonicalName();
+    private final String tableName;
     private List<BookData> bookList;
-    private FragmentActivity fragmentActivity;
+    private final FragmentActivity fragmentActivity;
+    private final String databaseName;
+    private final String whereClause;
+    private boolean deleteFlag;
 
     public static class ResultsViewHolder extends RecyclerView.ViewHolder {
         //define the View objects
-        ImageView thumbnail;
-        public TextView title;
-        TextView author;
-        public LinearLayout container;
-        Button advancedSearchButton;
+        final ImageView thumbnail;
+        final TextView title;
+        final TextView author;
+        final LinearLayout container;
+        final Button advancedSearchButton;
 
         ResultsViewHolder(View itemView) {
             super(itemView);
@@ -42,9 +54,16 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
         }
     }
 
-    ResultsAdapter(List<BookData> bookList, FragmentActivity fragmentActivity) {
+    public ResultsAdapter(FragmentActivity fragmentActivity, List<BookData> bookList, String databaseName, String tableName, String whereClause) {
         this.bookList = bookList;
         this.fragmentActivity = fragmentActivity;
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+        this.whereClause = whereClause;
+    }
+
+    public void setBookList(List<BookData> bookList) {
+        this.bookList = bookList;
     }
 
     @NonNull
@@ -62,8 +81,8 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ResultsViewHolder holder, int position) {
-        if(position == bookList.size()) {
+    public void onBindViewHolder(@NonNull ResultsViewHolder holder, final int position) {
+        if(position == bookList.size()) {//display advanced search button
             holder.advancedSearchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -74,7 +93,7 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
                 }
             });
 
-        }else {
+        }else {//display book info
             final BookData bookData = bookList.get(position);
             holder.title.setText(bookData.getTitle());
             holder.author.setText(bookData.getAuthors().get(0));//just the first one for this view
@@ -82,6 +101,8 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
             if (bookData.getThumbnailLink() != null) {
                 Picasso.get().cancelRequest(holder.thumbnail);
                 Picasso.get().load(bookData.getThumbnailLink()).into(holder.thumbnail);
+            }else if (bookData.getThumbnail() != null){
+                holder.thumbnail.setImageBitmap(bookData.getThumbnail());
             }
             holder.itemView.setTag(bookData);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -94,21 +115,61 @@ class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHold
                 }
             });
         }
-
     }
 
     // Return the size of your dataSet (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return bookList.size()+1; //the number of the results items +1 more view for the "advanced button"
+        try{
+            return bookList.size()+1; //the number of the results items +1 more view for the "advanced button"
+        }catch (NullPointerException npe){
+            return 1;//this means that the bookList is empty, so make the size =1 for the advanced button
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (position == bookList.size()) ? R.layout.advanced_search_button : R.layout.results_cardview;
+        try{
+            return (position == bookList.size()) ? R.layout.advanced_search_button : R.layout.results_cardview;
+        }catch (Exception e){
+            //if there is an exception the advanced search button is the only thing to be displayed(no data is to be displayed)
+            return R.layout.advanced_search_button;
+        }
     }
 
 
+    public void removeItem(final int position) {
+        deleteFlag = true;
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(deleteFlag){
+                    removeItemPermanently(bookList.get(position));
+                    deleteFlag = false;
+                }
+            }
+        }, 5000);
+        bookList.remove(position);
+        notifyItemRemoved(position);
+    }
 
+    public void restoreItem(BookData item, int position) {
+        deleteFlag=false;
+        bookList.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public List<BookData> getData() {
+        return bookList;
+    }
+
+    private void removeItemPermanently(BookData bookData){
+        Context context = fragmentActivity.getApplicationContext();
+        String dbPath = context.getDatabasePath(databaseName).getPath();
+        SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
+
+        db.delete(tableName, whereClause+"=\""+bookData.getCanonicalLink()+"\"", null);
+    }
 
 }
