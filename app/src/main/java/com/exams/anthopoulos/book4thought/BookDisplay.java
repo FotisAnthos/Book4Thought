@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.exams.anthopoulos.book4thought.Fragments.BookDisplayFragment;
@@ -13,7 +14,7 @@ import com.exams.anthopoulos.book4thought.Fragments.BookDisplayFragment;
 public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "BookDisplayTag";
-    private BookDisplayFragment bookDisplayFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_base);
@@ -21,28 +22,22 @@ public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnF
 
         Intent intent = getIntent();
         BookData bookData = intent.getParcelableExtra("bookData");
-        getSupportActionBar().setTitle(bookData.getTitle());
-
-        bookDisplayFragment = new BookDisplayFragment();
-
-        if (savedInstanceState == null) {
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager
-                    .beginTransaction();
-            bookDisplayFragment = new BookDisplayFragment();
-            bookDisplayFragment.setArguments(bookData);
-            fragmentTransaction.add(R.id.fragment_container, bookDisplayFragment, "bookDisplayFragment");
-            fragmentTransaction.commit();
-        } else {
-            this.bookDisplayFragment = (BookDisplayFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        try{
+            getSupportActionBar().setTitle(bookData.getTitle());
+        }catch (NullPointerException npe){
+            Log.w(TAG, npe.getMessage());
         }
 
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+        BookDisplayFragment bookDisplayFragment = new BookDisplayFragment();
+        bookDisplayFragment.setArguments(bookData);
+        fragmentTransaction.add(R.id.fragment_container, bookDisplayFragment, "bookDisplayFragment");
+        fragmentTransaction.commit();
+
+
     }
 
     public void onFragmentInteraction(BookData bookData){

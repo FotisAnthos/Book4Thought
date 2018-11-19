@@ -1,10 +1,7 @@
 package com.exams.anthopoulos.book4thought.Utilities;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.exams.anthopoulos.book4thought.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,21 +17,21 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class SearchTask extends AsyncTask<String, Void, JSONObject> {
 
+    private final String baseUrl;
+
     public interface AsyncResponse {
         void searchFinish(JSONObject output);
     }
 
     private static final String TAG = "SearchTaskTag";
-    private final String USER_AGENT = "Mozilla/5.0";
-    private Context context;
-    private String[] name = {"query", "intitle", "inauthor", "inpublisher", "subject", "isbn", "lccn", "oclc"};
-    private String[] value = new String[8];
+    private final String[] name = {"query", "intitle", "inauthor", "inpublisher", "subject", "isbn", "lccn", "oclc"};
+    private final String[] value = new String[8];
     private int length;
-    public AsyncResponse response;
+    private final AsyncResponse response;
 
-    public SearchTask(Context context, AsyncResponse response) {
-        this.context = context;
+    public SearchTask(String baseUrl, AsyncResponse response) {
         this.response = response;
+        this.baseUrl = baseUrl;
     }
 
     @Override
@@ -46,16 +43,15 @@ public class SearchTask extends AsyncTask<String, Void, JSONObject> {
             }
         }
 
-        JSONObject response = searchRequest();
-        return response;
+        return searchRequest();
     }
 
 
-    public String urlBuild(){
-        //example url: {https://www.googleapis.com/books/v1/volumes?}{q=}flowers{+inauthor:}keyes{&key=}yourAPIKey
+    private String urlBuild(){
+        //example url: {https://www.googleapis.com/books/v1/volumes?}{q=}flowers{+inauthor:}keys{&key=}yourAPIKey
         StringBuilder url = new StringBuilder();
         //Base url
-        url.append(context.getString(R.string.google_Books_API));
+        url.append(baseUrl);
         url.append("volumes?");
         //when a general query is requested
         if(this.value[0] != null){
@@ -65,20 +61,20 @@ public class SearchTask extends AsyncTask<String, Void, JSONObject> {
                 url.append(st.nextToken());
             }
             while(st.hasMoreTokens()){
-                url.append("+" + st.nextToken());
+                url.append("+").append(st.nextToken());
             }
         }
         //specific search fields
         for(int i=1; i<this.length; i++){
             if(this.value[i] != null){
-                url.append("+"+this.name[i]+":");
+                url.append("+").append(this.name[i]).append(":");
 
                 StringTokenizer st = new StringTokenizer(this.value[i]);
                 if(st.hasMoreTokens()){
                     url.append(st.nextToken());
                 }
                 while(st.hasMoreTokens()){
-                    url.append("+" + st.nextToken());
+                    url.append("+").append(st.nextToken());
                 }
             }
         }
@@ -90,12 +86,13 @@ public class SearchTask extends AsyncTask<String, Void, JSONObject> {
         return url.toString();
     }
 
-    public JSONObject searchRequest(){
-        BufferedReader bufferedReader = null;
+    private JSONObject searchRequest(){
+        BufferedReader bufferedReader;
         try {
             URL url = new URL(urlBuild());
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+            String USER_AGENT = "Mozilla/5.0";
             connection.setRequestProperty("User-Agent", USER_AGENT);
 
             String responseCode = Integer.toString(connection.getResponseCode());
@@ -103,7 +100,7 @@ public class SearchTask extends AsyncTask<String, Void, JSONObject> {
 
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-            StringBuffer stringBuffer = new StringBuffer();
+            StringBuilder stringBuffer = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null)
             {

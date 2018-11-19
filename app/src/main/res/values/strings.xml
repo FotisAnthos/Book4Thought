@@ -28,7 +28,7 @@
     <string name="sign_out">Sign Out</string>
     <string name="disconnect">Disconnect</string>
     <string name="signed_out">Signed Out</string>
-    <string name="noString" translatable="false" />
+    <string name="noString" translatable="false" >" "</string>
     <string name="profilePicture">Profile Picture</string>
     <string name="search_hint">Search Here</string>
     <string name="title_activity_main" translatable="false">Book4Thought</string>
@@ -50,4 +50,5 @@
     <string name="author">Author</string>
     <string name="save_to_local_db">Save to Local DB</string>
     <string name="NothingToShow">Nothing To Show</string>
+    <string name="deleteButton">deleteButton</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.exams.anthopoulos.book4thought.Utilities;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -25,16 +28,20 @@ import java.util.List;
 public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsViewHolder> {
 
     private static final String TAG = ResultsAdapter.class.getCanonicalName();
+    private final String tableName;
     private List<BookData> bookList;
-    private FragmentActivity fragmentActivity;
+    private final FragmentActivity fragmentActivity;
+    private final String databaseName;
+    private final String whereClause;
+    private boolean deleteFlag;
 
     public static class ResultsViewHolder extends RecyclerView.ViewHolder {
         //define the View objects
-        ImageView thumbnail;
-        public TextView title;
-        TextView author;
-        public LinearLayout container;
-        Button advancedSearchButton;
+        final ImageView thumbnail;
+        final TextView title;
+        final TextView author;
+        final LinearLayout container;
+        final Button advancedSearchButton;
 
         ResultsViewHolder(View itemView) {
             super(itemView);
@@ -47,9 +54,12 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
         }
     }
 
-    public ResultsAdapter(List<BookData> bookList, FragmentActivity fragmentActivity) {
+    public ResultsAdapter(FragmentActivity fragmentActivity, List<BookData> bookList, String databaseName, String tableName, String whereClause) {
         this.bookList = bookList;
         this.fragmentActivity = fragmentActivity;
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+        this.whereClause = whereClause;
     }
 
     public void setBookList(List<BookData> bookList) {
@@ -71,8 +81,8 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ResultsViewHolder holder, int position) {
-        if(position == bookList.size()) {
+    public void onBindViewHolder(@NonNull ResultsViewHolder holder, final int position) {
+        if(position == bookList.size()) {//display advanced search button
             holder.advancedSearchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -83,7 +93,7 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
                 }
             });
 
-        }else {
+        }else {//display book info
             final BookData bookData = bookList.get(position);
             holder.title.setText(bookData.getTitle());
             holder.author.setText(bookData.getAuthors().get(0));//just the first one for this view
@@ -105,7 +115,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
                 }
             });
         }
-
     }
 
     // Return the size of your dataSet (invoked by the layout manager)
@@ -116,7 +125,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
         }catch (NullPointerException npe){
             return 1;//this means that the bookList is empty, so make the size =1 for the advanced button
         }
-
     }
 
     @Override
@@ -130,6 +138,38 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
     }
 
 
+    public void removeItem(final int position) {
+        deleteFlag = true;
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(deleteFlag){
+                    removeItemPermanently(bookList.get(position));
+                    deleteFlag = false;
+                }
+            }
+        }, 5000);
+        bookList.remove(position);
+        notifyItemRemoved(position);
+    }
 
+    public void restoreItem(BookData item, int position) {
+        deleteFlag=false;
+        bookList.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public List<BookData> getData() {
+        return bookList;
+    }
+
+    private void removeItemPermanently(BookData bookData){
+        Context context = fragmentActivity.getApplicationContext();
+        String dbPath = context.getDatabasePath(databaseName).getPath();
+        SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
+
+        db.delete(tableName, whereClause+"=\""+bookData.getCanonicalLink()+"\"", null);
+    }
 
 }

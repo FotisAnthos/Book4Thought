@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity implements
         updateUI(account);
     }
 
-    public void signInGoogle(){
+    private void signInGoogle(){
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         loadingFragment = new LoadingFragment();
         loadingFragment.show(transaction, "loadingFragment");

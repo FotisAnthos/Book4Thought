@@ -21,13 +21,12 @@ import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.Sa
 
 public class SaveBookDBOperation implements Runnable {
     private static final String TAG = SaveBookDBOperation.class.getCanonicalName();
-    private String description;
-    private Context activity;
-    private String title;
-    private String author;
-    private String canonicalLink;
-    private Bitmap thumbnail;
-    private long result;
+    private final String description;
+    private final Context activity;
+    private final String title;
+    private final String author;
+    private final String canonicalLink;
+    private final Bitmap thumbnail;
 
     public SaveBookDBOperation(Activity activity, String title, String author, String description,String canonicalLink, Bitmap thumbnail) {
         this.activity = activity;
@@ -61,7 +60,7 @@ public class SaveBookDBOperation implements Runnable {
 
             // Insert the new row, returning the primary key value of the new row
             //will fail if book is already present in data base
-            result = db.insertOrThrow(TABLE_NAME, null, values);
+            long result = db.insertOrThrow(TABLE_NAME, null, values);
 
             if(result > 0) {
                 Toast.makeText(activity, title + " Saved!", Toast.LENGTH_SHORT).show();

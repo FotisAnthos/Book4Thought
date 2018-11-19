@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,6 @@ public class BookDisplayFragment extends Fragment {
     private BookData bookData;
     private View rootView;
     private ImageView thumbnailView;
-    private Context context;
 
     public BookDisplayFragment() {
         // Required empty public constructor
@@ -33,8 +33,7 @@ public class BookDisplayFragment extends Fragment {
 
 
     public static BookDisplayFragment newInstance() {
-        BookDisplayFragment fragment = new BookDisplayFragment();
-        return fragment;
+        return new BookDisplayFragment();
     }
 
     @Override
@@ -44,7 +43,7 @@ public class BookDisplayFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_book_display, container, false);
@@ -68,7 +67,7 @@ public class BookDisplayFragment extends Fragment {
         StringBuilder tmpAuthors = new StringBuilder(bookData.getAuthors().get(0));
 
         for(int i=1; i<bookData.getAuthors().size(); i++){
-            tmpAuthors.append(", " + bookData.getAuthors().get(i));
+            tmpAuthors.append(", ").append(bookData.getAuthors().get(i));
         }
         authors.setText(tmpAuthors.toString());
 
@@ -98,7 +97,6 @@ public class BookDisplayFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {

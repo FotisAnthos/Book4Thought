@@ -13,7 +13,7 @@ import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.DE
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getCanonicalName();
     private static final int DATABASE_VERSION = 1;
-    static final String DATABASE_NAME = "SavedBooks.db";
+    public static final String DATABASE_NAME = "SavedBooks.db";
 
 
     public DatabaseHelper(@Nullable Context context) {

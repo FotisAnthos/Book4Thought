@@ -11,8 +11,7 @@ import java.util.List;
 
 
 public class MainActivity extends BaseActivity{
-    LoadingFragment loadingFragment;
-    List<BookData> savedBooks;
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +41,8 @@ public class MainActivity extends BaseActivity{
         loadingFragment.show(transaction, "loadingFragment");
     }
 
-    public void booksReady(List<BookData> savedBooks) {
+    private void booksReady(List<BookData> savedBooks) {
         loadingFragment.dismiss();
-        this.savedBooks = savedBooks;
 
         DBBooks dbBooks = new DBBooks();
         dbBooks.setBookList(savedBooks);

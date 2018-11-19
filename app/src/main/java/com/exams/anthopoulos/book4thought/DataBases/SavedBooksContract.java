@@ -33,5 +33,4 @@ public class SavedBooksContract {
         public static final String COLUMN_NAME_THUMBNAIL= "thumbnail";
     }
 
-
 }

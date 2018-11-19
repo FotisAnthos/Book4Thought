@@ -1,7 +1,6 @@
 package com.exams.anthopoulos.book4thought.DataBases;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -25,31 +24,27 @@ import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.Sa
 
 public class RetrieveBooksDBOperation extends AsyncTask<String, Void, List<BookData>> {
     private static final String TAG = RetrieveBooksDBOperation.class.getCanonicalName();
-    private List<BookData> savedBooks;
-    private  Activity activity;
-    public AsyncResponse response;
+    private final AsyncResponse response;
+    private final String dbPath;
 
     public interface AsyncResponse {
         void booksRetrieved(List<BookData> savedBooks);
     }
 
     public RetrieveBooksDBOperation(Activity activity, AsyncResponse response) {
-        this.activity = activity;
         this.response = response;
+        dbPath = activity.getApplicationContext().getDatabasePath(DATABASE_NAME).getPath();
     }
 
 
     @Override
     protected List<BookData> doInBackground(String... strings) {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-        savedBooks = new ArrayList<>();
+        List<BookData> savedBooks = new ArrayList<>();
 
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
 
-
-        Context context = activity.getApplicationContext();
-        String dbPath = context.getDatabasePath(DATABASE_NAME).getPath();
         try {
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
             Cursor cursor = db.rawQuery(selectQuery, null);

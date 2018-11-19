@@ -2,6 +2,7 @@ package com.exams.anthopoulos.book4thought.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +23,7 @@ public class MainFragment extends Fragment {
 
 
     public static MainFragment newInstance() {
-        MainFragment fragment = new MainFragment();
-        return fragment;
+        return new MainFragment();
     }
 
     @Override
@@ -34,10 +34,9 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        return rootView;
+        return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -52,9 +51,6 @@ public class MainFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
-        } else {
-            //throw new RuntimeException(context.toString() TODO
-            //     + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -65,7 +61,7 @@ public class MainFragment extends Fragment {
     }
 
 
-    public interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
         void onFragmentInteraction();
     }
 }

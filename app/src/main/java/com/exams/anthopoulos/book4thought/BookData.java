@@ -9,16 +9,15 @@ import java.util.List;
 
 public class BookData implements Parcelable {
     private String previewLink;
-    private String title;
-    private List<String> authors;
-    private String description; //a short description of the book's contents
+    private final String title;
+    private final List<String> authors;
+    private final String description; //a short description of the book's contents
     private String selfLink; //a google books link to get just this specific book
-    private String canonicalLink;
+    private final String canonicalLink;
     private String thumbnailLink;
     private Bitmap thumbnail;
 
-
-    public BookData(String title, List<String> authors, String description, String selfLink, String canonicalLink, String thumbnailLink, String previewLink, String id) {
+    public BookData(String title, List<String> authors, String description, String selfLink, String canonicalLink, String thumbnailLink, String previewLink) {
         this.title = title;
         this.authors = authors;
         this.description = description;
@@ -37,7 +36,6 @@ public class BookData implements Parcelable {
         this.canonicalLink = canonicalLink;
         this.thumbnail = thumbnail;
     }
-
 
     public String getTitle() {
         return title;
@@ -63,22 +61,6 @@ public class BookData implements Parcelable {
         return thumbnail;
     }
 
-    //Parcelable Components
-    protected BookData(Parcel in) {
-        previewLink = in.readString();
-        title = in.readString();
-        if (in.readByte() == 0x01) {
-            authors = new ArrayList<String>();
-            in.readList(authors, String.class.getClassLoader());
-        } else {
-            authors = null;
-        }
-        description = in.readString();
-        selfLink = in.readString();
-        canonicalLink = in.readString();
-        thumbnailLink = in.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -86,25 +68,31 @@ public class BookData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(previewLink);
-        dest.writeString(title);
-        if (authors == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(authors);
-        }
-        dest.writeString(description);
-        dest.writeString(selfLink);
-        dest.writeString(canonicalLink);
-        dest.writeString(thumbnailLink);
+        dest.writeString(this.previewLink);
+        dest.writeString(this.title);
+        dest.writeStringList(this.authors);
+        dest.writeString(this.description);
+        dest.writeString(this.selfLink);
+        dest.writeString(this.canonicalLink);
+        dest.writeString(this.thumbnailLink);
+        dest.writeParcelable(this.thumbnail, flags);
     }
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<BookData> CREATOR = new Parcelable.Creator<BookData>() {
+    private BookData(Parcel in) {
+        this.previewLink = in.readString();
+        this.title = in.readString();
+        this.authors = in.createStringArrayList();
+        this.description = in.readString();
+        this.selfLink = in.readString();
+        this.canonicalLink = in.readString();
+        this.thumbnailLink = in.readString();
+        this.thumbnail = in.readParcelable(Bitmap.class.getClassLoader());
+    }
+
+    public static final Creator<BookData> CREATOR = new Creator<BookData>() {
         @Override
-        public BookData createFromParcel(Parcel in) {
-            return new BookData(in);
+        public BookData createFromParcel(Parcel source) {
+            return new BookData(source);
         }
 
         @Override
@@ -112,5 +100,4 @@ public class BookData implements Parcelable {
             return new BookData[size];
         }
     };
-
 }

@@ -2,6 +2,7 @@ package com.exams.anthopoulos.book4thought;
 
 import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,13 +36,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "BaseActivityTag";
     private static final int RC_SIGN_IN = 9001;
     private NavigationView navigationView;
     private GoogleSignInClient mGoogleSignInClient;
-    private GoogleSignInAccount account;
     private boolean doubleBackToExitPressedOnce = false;
     private Menu menu;
     private LoadingFragment loadingFragment;
@@ -83,7 +85,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         super.onStart();
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        account = GoogleSignIn.getLastSignedInAccount(this);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         //update the UI accordingly
         updateUI(account);
     }
@@ -164,7 +166,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 });
     }
 
-    public void updateUI(GoogleSignInAccount account){
+    private void updateUI(GoogleSignInAccount account){
         Menu menu = navigationView.getMenu();
         final ImageView profileImage = navigationView.getHeaderView(0).findViewById(R.id.navProfileImage);
         TextView userName = navigationView.getHeaderView(0).findViewById(R.id.navProfileUsername);
@@ -180,10 +182,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    String url = Objects.requireNonNull(account.getPhotoUrl()).toString();
+                    Drawable placeholder = getDrawable(R.drawable.ic_launcher_background);
                     Picasso.get()
-                            .load(account.getPhotoUrl().toString())
-                            .placeholder(getDrawable(R.drawable.ic_launcher_background))
-                            .into(profileImage);
+                                .load(url)
+                                .placeholder(placeholder)
+                                .into(profileImage);
                 }
             }catch (Exception e){
                 Log.w(TAG, "Could not load profile image");
@@ -322,11 +326,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
         // AUTHORITY is a unique name, but it is recommended to use the name of the
         // package followed by the name of the class.
-        public final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
+        final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
 
         // Uncomment line below, if you want to provide two lines in each suggestion:
         // public final static int MODE = DATABASE_MODE_QUERIES | DATABASE_MODE_2LINES;
-        public final static int MODE = DATABASE_MODE_QUERIES;
+        final static int MODE = DATABASE_MODE_QUERIES;
 
         public SearchSuggestionProvider() {
             setupSuggestions(AUTHORITY, MODE);
