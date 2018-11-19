@@ -33,9 +33,8 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
     private final FragmentActivity fragmentActivity;
     private final String databaseName;
     private final String whereClause;
-    private boolean deleteFlag;
 
-    public static class ResultsViewHolder extends RecyclerView.ViewHolder {
+    static class ResultsViewHolder extends RecyclerView.ViewHolder {
         //define the View objects
         final ImageView thumbnail;
         final TextView title;
@@ -139,14 +138,15 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
 
 
     public void removeItem(final int position) {
-        deleteFlag = true;
-        final Handler handler = new Handler();
+        Handler handler = new Handler();
+        final BookData bookForDelete = bookList.get(position);
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(deleteFlag){
-                    removeItemPermanently(bookList.get(position));
-                    deleteFlag = false;
+                //if the bookForDelete is no longer in the bookList after 4 secs, delete it from the db permanently
+                if(!bookList.contains(bookForDelete)){
+                    removeItemPermanently(bookForDelete);
                 }
             }
         }, 5000);
@@ -155,7 +155,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
     }
 
     public void restoreItem(BookData item, int position) {
-        deleteFlag=false;
         bookList.add(position, item);
         notifyItemInserted(position);
     }
