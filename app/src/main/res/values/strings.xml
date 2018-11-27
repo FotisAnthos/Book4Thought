@@ -51,4 +51,7 @@
     <string name="save_to_local_db">Save to Local DB</string>
     <string name="NothingToShow">Nothing To Show</string>
     <string name="deleteButton">deleteButton</string>
+    <string name="bookmark">bookmark</string>
+    <string name="save_book">Save Book</string>
+    <string name="not_connected">Not Connected to the Internet!</string>
 </resources>

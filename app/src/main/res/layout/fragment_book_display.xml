@@ -50,10 +50,33 @@
 
                 <TextView
                     android:id="@+id/display_book_authors"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/book_author"
                     android:gravity="center_vertical|center_horizontal" />
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:isIndicator="true"
+                    android:numStars="@integer/no_of_stars"
+                    android:padding="8dp"
+                    android:stepSize="1" />
+
+                <ImageButton
+                    android:id="@+id/save_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="false"
+                    android:background="@color/colorGeneralBackground"
+                    android:contentDescription="@string/save_book"
+                    android:cropToPadding="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/image_save_book" />
 
             </LinearLayout>
 
@@ -73,10 +96,5 @@
             android:layout_height="wrap_content"
             android:text="@string/open_on_google_play" />
 
-        <Button
-            android:id="@+id/btn_save_local"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/save_to_local_db" />
     </LinearLayout>
 </ScrollView>
