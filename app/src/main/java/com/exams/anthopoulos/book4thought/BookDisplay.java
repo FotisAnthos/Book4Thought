@@ -17,8 +17,10 @@ public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnF
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_base);
-        super.onCreate(savedInstanceState);
+        Bundle extendedSavedInstanceState = new Bundle();
+        extendedSavedInstanceState.putInt("layout", R.layout.activity_base);
+        extendedSavedInstanceState.putBundle("savedInstanceState", savedInstanceState);
+        super.onCreate(extendedSavedInstanceState);
 
         Intent intent = getIntent();
         BookData bookData = intent.getParcelableExtra("bookData");

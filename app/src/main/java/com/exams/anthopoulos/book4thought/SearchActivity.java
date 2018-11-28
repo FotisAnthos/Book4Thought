@@ -24,8 +24,11 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_base);
-        super.onCreate(savedInstanceState);
+        Bundle extendedSavedInstanceState = new Bundle();
+        extendedSavedInstanceState.putInt("layout", R.layout.activity_base);
+        extendedSavedInstanceState.putBundle("savedInstanceState", savedInstanceState);
+        super.onCreate(extendedSavedInstanceState);
+
         booksList = new ArrayList<>();
 
         //View initialization, show loading Fragment until results are ready to display
