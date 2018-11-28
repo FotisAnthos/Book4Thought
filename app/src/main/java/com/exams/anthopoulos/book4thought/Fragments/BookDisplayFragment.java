@@ -54,7 +54,8 @@ public class BookDisplayFragment extends Fragment {
         TextView title = rootView.findViewById(R.id.display_book_title);
         TextView authors = rootView.findViewById(R.id.display_book_authors);
         TextView description = rootView.findViewById(R.id.display_book_description);
-        Button readBookButton = rootView.findViewById(R.id.display_read_book_button);
+        Button openInGooglePlayBookButton = rootView.findViewById(R.id.open_gplay_book_button);
+        Button readBookButton = rootView.findViewById(R.id.read_book_button);
         RatingBar ratingBar = rootView.findViewById(R.id.ratingBar);
         ImageButton bookmarkButton = rootView.findViewById(R.id.save_button);
 
@@ -88,11 +89,19 @@ public class BookDisplayFragment extends Fragment {
 
         description.setText(bookData.getDescription());
 
+        openInGooglePlayBookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rootView.findViewById(R.id.book_display_scroll).scrollTo(0, 0);
+                mListener.onFragmentInteraction(bookData.getTitle(), bookData.getCanonicalLink());
+            }
+        });
+
         readBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rootView.findViewById(R.id.book_display_scroll).scrollTo(0, 0);
-                mListener.onFragmentInteraction(bookData);
+                mListener.onFragmentInteraction(bookData.getTitle(), bookData.getWebReaderLink());
             }
         });
 
@@ -122,6 +131,6 @@ public class BookDisplayFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(BookData bookData);
+        void onFragmentInteraction(String bookTitle, String canonicalLink);
     }
 }
