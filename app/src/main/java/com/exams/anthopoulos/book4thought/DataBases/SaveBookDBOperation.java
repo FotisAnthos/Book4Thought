@@ -10,13 +10,19 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.exams.anthopoulos.book4thought.BookData;
+
 import java.io.ByteArrayOutputStream;
 
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_AUTHOR;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CANONICAL_LINK;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CATEGORY;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_DESCRIPTION;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS_COUNT;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_THUMBNAIL;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_TITLE;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_WEB_READER_LINK;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.TABLE_NAME;
 
 public class SaveBookDBOperation implements Runnable {
@@ -24,17 +30,30 @@ public class SaveBookDBOperation implements Runnable {
     private final String description;
     private final Context activity;
     private final String title;
-    private final String author;
+    private String author;
     private final String canonicalLink;
     private final Bitmap thumbnail;
+    private String category;
+    private final String webReaderLink;
+    private final int rating;
+    private final int ratingsCount;
 
-    public SaveBookDBOperation(Activity activity, String title, String author, String description,String canonicalLink, Bitmap thumbnail) {
+    public SaveBookDBOperation(Activity activity, BookData bookData, Bitmap thumbnail) {
         this.activity = activity;
-        this.title = title;
-        this.author = author;
-        this.description = description;
-        this.canonicalLink = canonicalLink;
+        this.title = bookData.getTitle();
+        this.description = bookData.getDescription();
+        this.canonicalLink = bookData.getCanonicalLink();
         this.thumbnail = thumbnail;
+        this.rating = bookData.getRating();
+        this.ratingsCount = bookData.getRatingsCount();
+        this.webReaderLink = bookData.getWebReaderLink();
+        try{
+            this.category = bookData.getCategories().get(0);
+        }catch (NullPointerException npe){this.category="";}
+        try{
+            this.author = bookData.getAuthors().get(0);
+        }catch (NullPointerException npe){this.author = "";}
+
     }
 
     @Override
@@ -57,6 +76,10 @@ public class SaveBookDBOperation implements Runnable {
             values.put(COLUMN_NAME_DESCRIPTION, description);
             values.put(COLUMN_NAME_CANONICAL_LINK, canonicalLink);
             values.put(COLUMN_NAME_THUMBNAIL, thumbnailByte);
+            values.put(COLUMN_NAME_CATEGORY, category);
+            values.put(COLUMN_NAME_RATINGS, rating);
+            values.put(COLUMN_NAME_RATINGS_COUNT, ratingsCount);
+            values.put(COLUMN_NAME_WEB_READER_LINK, webReaderLink);
 
             // Insert the new row, returning the primary key value of the new row
             //will fail if book is already present in data base
@@ -69,7 +92,7 @@ public class SaveBookDBOperation implements Runnable {
 
         }catch (SQLiteConstraintException SQLiCE){
             //if book is already present in data base, SQLiteConstraintException will be thrown
-            Toast.makeText(activity, title +" Already Saved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, title +" is already Saved!", Toast.LENGTH_SHORT).show();
         }catch (Throwable e) {
             Log.w(TAG, e.getMessage());
         }

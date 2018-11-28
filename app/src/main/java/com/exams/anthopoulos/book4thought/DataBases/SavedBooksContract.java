@@ -5,9 +5,13 @@ import android.provider.BaseColumns;
 import static android.provider.BaseColumns._ID;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_AUTHOR;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CANONICAL_LINK;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CATEGORY;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_DESCRIPTION;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS_COUNT;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_THUMBNAIL;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_TITLE;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_WEB_READER_LINK;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.TABLE_NAME;
 
 public class SavedBooksContract {
@@ -17,6 +21,10 @@ public class SavedBooksContract {
             COLUMN_NAME_AUTHOR + " TEXT NOT NULL," +
             COLUMN_NAME_DESCRIPTION + " TEXT NOT NULL," +
             COLUMN_NAME_CANONICAL_LINK + " TEXT NOT NULL UNIQUE,"+
+            COLUMN_NAME_RATINGS + " TEXT NOT NULL,"+
+            COLUMN_NAME_CATEGORY + " TEXT NOT NULL,"+
+            COLUMN_NAME_RATINGS_COUNT + " TEXT NOT NULL,"+
+            COLUMN_NAME_WEB_READER_LINK + " TEXT NOT NULL,"+
             COLUMN_NAME_THUMBNAIL + " BLOB);";
 
     public static final String DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -31,6 +39,10 @@ public class SavedBooksContract {
         public static final String COLUMN_NAME_DESCRIPTION = "description";
         public static final String COLUMN_NAME_CANONICAL_LINK = "canonicalLink";
         public static final String COLUMN_NAME_THUMBNAIL= "thumbnail";
+        public static final String COLUMN_NAME_CATEGORY= "category";
+        public static final String COLUMN_NAME_RATINGS= "ratings";
+        public static final String COLUMN_NAME_RATINGS_COUNT= "ratingsCount";
+        public static final String COLUMN_NAME_WEB_READER_LINK = "webReaderLink";
     }
 
 }

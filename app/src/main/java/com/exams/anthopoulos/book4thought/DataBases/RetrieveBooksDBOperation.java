@@ -17,9 +17,13 @@ import java.util.List;
 import static com.exams.anthopoulos.book4thought.DataBases.DatabaseHelper.DATABASE_NAME;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_AUTHOR;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CANONICAL_LINK;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_CATEGORY;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_DESCRIPTION;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_RATINGS_COUNT;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_THUMBNAIL;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_TITLE;
+import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.COLUMN_NAME_WEB_READER_LINK;
 import static com.exams.anthopoulos.book4thought.DataBases.SavedBooksContract.SavedBookEntry.TABLE_NAME;
 
 public class RetrieveBooksDBOperation extends AsyncTask<String, Void, List<BookData>> {
@@ -56,12 +60,16 @@ public class RetrieveBooksDBOperation extends AsyncTask<String, Void, List<BookD
                     String author = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_AUTHOR));
                     String description = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION));
                     String canonicalLink = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CANONICAL_LINK));
+                    String category = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CATEGORY));
+                    String webReaderLink = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_WEB_READER_LINK));
+                    int rating =cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATINGS));
+                    int ratingsCount =cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATINGS_COUNT));
 
                     //get the blob and convert to bitmap
                     byte[] rawThumbnail = cursor.getBlob(cursor.getColumnIndex(COLUMN_NAME_THUMBNAIL));
                     Bitmap thumbnail = BitmapFactory.decodeByteArray(rawThumbnail, 0, rawThumbnail.length);
 
-                    BookData book = new BookData(title, author, description, canonicalLink, thumbnail);
+                    BookData book = new BookData(title, author, description, canonicalLink, thumbnail, category, rating, ratingsCount, webReaderLink);
                     savedBooks.add(book);
                 } while (cursor.moveToNext());
             }

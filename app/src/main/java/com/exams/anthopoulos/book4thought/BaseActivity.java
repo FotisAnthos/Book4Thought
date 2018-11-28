@@ -1,8 +1,11 @@
 package com.exams.anthopoulos.book4thought;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,7 +41,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "BaseActivityTag";
     private static final int RC_SIGN_IN = 9001;
@@ -56,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -108,8 +111,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             // The Task returned from this call is always completed, no need to attach a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
-        }
-        else{
+        } else {
             Log.e(TAG, "onActivityResult: requestCode != RC_SIGN_IN");
         }
     }
@@ -143,7 +145,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private void signOutGoogle() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         loadingFragment = new LoadingFragment();
-        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.signOut()
+        loadingFragment.show(transaction, "loadingFragment");
+        mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -156,7 +159,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private void revokeAccessGoogle() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         loadingFragment = new LoadingFragment();
-        loadingFragment.show(transaction, "loadingFragment");        mGoogleSignInClient.revokeAccess()
+        loadingFragment.show(transaction, "loadingFragment");
+        mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -166,13 +170,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 });
     }
 
-    private void updateUI(GoogleSignInAccount account){
+    private void updateUI(GoogleSignInAccount account) {
         Menu menu = navigationView.getMenu();
         final ImageView profileImage = navigationView.getHeaderView(0).findViewById(R.id.navProfileImage);
         TextView userName = navigationView.getHeaderView(0).findViewById(R.id.navProfileUsername);
         TextView email = navigationView.getHeaderView(0).findViewById(R.id.navProfileMail);
 
-        if(account != null){//if signed in
+        if (account != null) {//if signed in
             menu.findItem(R.id.nav_signIn).setVisible(false);
             menu.findItem(R.id.nav_signOut).setVisible(true);
             menu.findItem(R.id.nav_disconnect).setVisible(true);
@@ -185,11 +189,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                     String url = Objects.requireNonNull(account.getPhotoUrl()).toString();
                     Drawable placeholder = getDrawable(R.drawable.ic_launcher_background);
                     Picasso.get()
-                                .load(url)
-                                .placeholder(placeholder)
-                                .into(profileImage);
+                            .load(url)
+                            .placeholder(placeholder)
+                            .into(profileImage);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.w(TAG, "Could not load profile image");
             }
 
@@ -210,8 +214,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 }
             }
             */
-        }
-        else{//if not signed in
+        } else {//if not signed in
             menu.findItem(R.id.nav_signIn).setVisible(true);
             menu.findItem(R.id.nav_signOut).setVisible(false);
             menu.findItem(R.id.nav_disconnect).setVisible(false);
@@ -226,7 +229,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.action_search) {
+        if (id == R.id.action_search) {
             MenuItem search = findViewById(R.id.action_search);
             search.isChecked();
             return true;
@@ -266,15 +269,21 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //prepare the new intent
-                Intent search = new Intent(getBaseContext(), SearchActivity.class);
-                search.putExtra("query", query);
-                //reset the searchView
-                searchView.setQuery("", false);
-                searchView.setIconified(true);
-                searchView.clearFocus();
-                //start the new (search) activity
-                startActivity(search);
+                if(isConnected()){
+                    //prepare the new intent
+                    Intent search = new Intent(getBaseContext(), SearchActivity.class);
+                    search.putExtra("query", query);
+                    //reset the searchView
+                    searchView.setQuery("", false);
+                    searchView.setIconified(true);
+                    searchView.clearFocus();
+                    //start the new (search) activity
+                    startActivity(search);
+                }
+                else{
+                    String warning = getResources().getString(R.string.not_connected);
+                    Toast.makeText(getBaseContext(), warning, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
 
@@ -295,8 +304,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         //if the drawer is open, close it
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else if( !searchItem.isIconified() ){
+        } else if (!searchItem.isIconified()) {
             searchItem.onActionViewCollapsed();
         }
         //else if the current fragment is the "MainFragment"
@@ -304,23 +312,23 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             if (doubleBackToExitPressedOnce) {
                 //if back button has already been pressed once
                 super.onBackPressed();
-            }
-            else {
+            } else {
                 //update back button is already pressed once(revert to not pressed after 2secs)
                 doubleBackToExitPressedOnce = true;
                 Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
                 new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() { doubleBackToExitPressedOnce = false; }
-                    }, 2000);//execute (order 65) after 2secs
-                }
+                    @Override
+                    public void run() {
+                        doubleBackToExitPressedOnce = false;
+                    }
+                }, 2000);//execute (order 65) after 2secs
             }
-            else {
-                //if any other fragments are the current ones, go back
-                super.onBackPressed();
-            }
+        } else {
+            //if any other fragments are the current ones, go back
+            super.onBackPressed();
         }
+    }
 
 
     public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
@@ -335,6 +343,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         public SearchSuggestionProvider() {
             setupSuggestions(AUTHORITY, MODE);
         }
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

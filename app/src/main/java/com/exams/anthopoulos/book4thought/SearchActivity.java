@@ -1,12 +1,8 @@
 package com.exams.anthopoulos.book4thought;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
 import com.exams.anthopoulos.book4thought.Fragments.SearchResultsFragment;
@@ -46,33 +42,23 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
 
         String query = getIntent().getStringExtra("query");
 
-        try{
+        try {
             getSupportActionBar().setTitle(query);
-        }catch (NullPointerException npe){
+        } catch (NullPointerException npe) {
             Log.w(TAG, npe.getMessage());
         }
 
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-
-                SearchTask searchTask = new SearchTask(getString(R.string.google_Books_API), new SearchTask.AsyncResponse() {
-                    @Override
-                    public void searchFinish(JSONObject output) {
-                        searchResults = output;
-                        dataGather();
-                    }
-                });
-                searchTask.execute(query);
-
-            }   else {
-                Toast.makeText(this, "Not connected to the Internet!", Toast.LENGTH_LONG).show();
+        SearchTask searchTask = new SearchTask(getString(R.string.google_Books_API), new SearchTask.AsyncResponse() {
+            @Override
+            public void searchFinish(JSONObject output) {
+                searchResults = output;
+                dataGather();
             }
-        }
-
-
+        });
+        searchTask.execute(query);
     }
+
+
 
     private void dataGather(){
         booksList = new ArrayList<>();
@@ -84,29 +70,91 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
             else resultsLength = array.length();
 
             for(int index=0; index < resultsLength; index++){//for the items listed in the json
+                String title, description, thumbnailLink, selfLink, canonicalLink, previewLink, webReaderLink;
+                int rating, ratingsCount;
+
                 JSONObject book = array.getJSONObject(index);
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
-                String title, description, thumbnailLink, selfLink, canonicalLink, previewLink, id;
-
-                title = volumeInfo.getString("title");
-                JSONArray jsAuthors = volumeInfo.getJSONArray("authors");
-                ArrayList<String> authors = new ArrayList<>();
-                for(int authorIndex=0; authorIndex < jsAuthors.length(); authorIndex++){
-                    authors.add(jsAuthors.getString(authorIndex));
+                JSONObject accessInfo = book.getJSONObject("accessInfo");
+                //Book Title
+                try{
+                    title = volumeInfo.getString("title");
+                }catch (JSONException e){
+                    title = "";
+                    Log.i(TAG, e.getMessage());
                 }
-
-                description = volumeInfo.getString("description");
+                //Book Authors
+                ArrayList<String> authors = new ArrayList<>();
+                try{
+                    JSONArray jsAuthors = volumeInfo.getJSONArray("authors");
+                    for(int authorIndex=0; authorIndex < jsAuthors.length(); authorIndex++){
+                        authors.add(jsAuthors.getString(authorIndex));
+                    }
+                }catch (JSONException e){
+                    Log.i(TAG, e.getMessage());
+                }
+                //Book categories
+                ArrayList<String> bookCategories = new ArrayList<>();
+                try{
+                    JSONArray jBookCategories = volumeInfo.getJSONArray("categories");
+                    for(int catIndex=0; catIndex < jBookCategories.length(); catIndex++){
+                        bookCategories.add(jBookCategories.getString(catIndex));
+                    }
+                }catch (JSONException e){
+                    Log.i(TAG, e.getMessage());
+                }
+                //Book rating
+                try{
+                    rating = volumeInfo.getInt("averageRating");
+                }catch (JSONException e){
+                    rating = 0;
+                    Log.i(TAG, e.getMessage());
+                }
+                //Book ratings count
+                try{
+                    ratingsCount = volumeInfo.getInt("ratingsCount");
+                }catch (JSONException e){
+                    ratingsCount = 0;
+                    Log.i(TAG, e.getMessage());
+                }
+                //Book description
+                try{
+                    description = volumeInfo.getString("description");
+                }catch (JSONException e){
+                    description = "";
+                    Log.i(TAG, e.getMessage());
+                }
+                //Book Thumbnail
                 try{
                     thumbnailLink = volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail");
                 }catch (JSONException e){
                     thumbnailLink = null;
                 }
 
-                selfLink = book.getString("selfLink");
-                canonicalLink = volumeInfo.getString("canonicalVolumeLink");
-                previewLink = volumeInfo.getString("previewLink");
+                try{
+                    selfLink = book.getString("selfLink");
+                }catch (JSONException e){
+                    selfLink = "";
+                }
+                try{
+                    previewLink = volumeInfo.getString("previewLink");
+                }catch (JSONException e){
+                    previewLink = "";
+                }
+                //Book Canonical Link
+                try{
+                    canonicalLink = volumeInfo.getString("canonicalVolumeLink");
+                }catch (JSONException e){
+                    canonicalLink = "";
+                }
+                //Book web reader link
+                try{
+                    webReaderLink = accessInfo.getString("webReaderLink");
+                }catch (JSONException e){
+                    webReaderLink = "";
+                }
 
-                BookData bd = new BookData(title, authors, description, selfLink, canonicalLink, thumbnailLink, previewLink);
+                BookData bd = new BookData(title, authors, description, selfLink, previewLink, canonicalLink, thumbnailLink, bookCategories, rating, ratingsCount, webReaderLink);
                 booksList.add(bd);
             }
             //when the results are ready, display the search results

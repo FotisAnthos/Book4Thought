@@ -40,29 +40,30 @@ public class BookDisplay extends BaseActivity implements BookDisplayFragment.OnF
 
     }
 
-    public void onFragmentInteraction(BookData bookData){
+    public void onFragmentInteraction(String bookTitle, String destination){
         BookDisplayFragment bookDisplayFragment = (BookDisplayFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         if (bookDisplayFragment != null) {
             try {//try opening in Google Play
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(bookData.getCanonicalLink()));
+                intent.setData(Uri.parse(destination));
                 intent.setPackage("com.android.vending");
                 startActivity(intent);
             }catch (Exception e){
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(bookData.getCanonicalLink()));
+                        Uri.parse(destination));
                 Intent chooseIntent = Intent.createChooser(browserIntent , "Choose browser ");
                 // Verify that the intent will resolve to an activity
                 if (chooseIntent.resolveActivity(getPackageManager()) != null) {
                     // Here we use an intent without a Chooser unlike the next example
                     startActivity(chooseIntent);
                 }
-                Toast.makeText(this, bookData.getTitle() + " not found on Play Store", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, bookTitle + " not found on Play Store", Toast.LENGTH_SHORT).show();
             }
         }
 
     }
+
 
 
 }

@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.exams.anthopoulos.book4thought.BookData;
@@ -52,8 +54,10 @@ public class BookDisplayFragment extends Fragment {
         TextView title = rootView.findViewById(R.id.display_book_title);
         TextView authors = rootView.findViewById(R.id.display_book_authors);
         TextView description = rootView.findViewById(R.id.display_book_description);
-        Button readBookButton = rootView.findViewById(R.id.display_read_book_button);
-        Button localSaveButton = rootView.findViewById(R.id.btn_save_local);
+        Button openInGooglePlayBookButton = rootView.findViewById(R.id.open_gplay_book_button);
+        Button readBookButton = rootView.findViewById(R.id.read_book_button);
+        RatingBar ratingBar = rootView.findViewById(R.id.ratingBar);
+        ImageButton bookmarkButton = rootView.findViewById(R.id.save_button);
 
         if(bookData.getThumbnailLink() != null) {
             Picasso.get().cancelRequest(thumbnailView);
@@ -66,6 +70,18 @@ public class BookDisplayFragment extends Fragment {
 
         StringBuilder tmpAuthors = new StringBuilder(bookData.getAuthors().get(0));
 
+        ratingBar.setRating(bookData.getRating()+1);
+
+        bookmarkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap=((BitmapDrawable) thumbnailView.getDrawable()).getBitmap();
+                Handler handler = new Handler();
+                SaveBookDBOperation save = new SaveBookDBOperation(getActivity(), bookData, bitmap);
+                handler.post(save);
+            }
+        });
+
         for(int i=1; i<bookData.getAuthors().size(); i++){
             tmpAuthors.append(", ").append(bookData.getAuthors().get(i));
         }
@@ -73,23 +89,22 @@ public class BookDisplayFragment extends Fragment {
 
         description.setText(bookData.getDescription());
 
+        openInGooglePlayBookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rootView.findViewById(R.id.book_display_scroll).scrollTo(0, 0);
+                mListener.onFragmentInteraction(bookData.getTitle(), bookData.getCanonicalLink());
+            }
+        });
+
         readBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rootView.findViewById(R.id.book_display_scroll).scrollTo(0, 0);
-                mListener.onFragmentInteraction(bookData);
+                mListener.onFragmentInteraction(bookData.getTitle(), bookData.getWebReaderLink());
             }
         });
 
-        localSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bitmap bitmap=((BitmapDrawable) thumbnailView.getDrawable()).getBitmap();
-                Handler handler = new Handler();
-                SaveBookDBOperation save = new SaveBookDBOperation(getActivity(), bookData.getTitle(), bookData.getAuthors().get(0), bookData.getDescription(),bookData.getCanonicalLink(), bitmap);
-                handler.post(save);
-            }
-        });
         return rootView;
     }
 
@@ -116,6 +131,6 @@ public class BookDisplayFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(BookData bookData);
+        void onFragmentInteraction(String bookTitle, String canonicalLink);
     }
 }
