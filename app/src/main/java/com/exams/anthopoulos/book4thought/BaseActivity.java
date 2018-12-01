@@ -54,7 +54,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        int layoutCode = savedInstanceState.getInt("layout");
+        Bundle savedInstanceStateDefault = savedInstanceState.getBundle("savedInstanceState");
+        setContentView(layoutCode);
+        super.onCreate(savedInstanceStateDefault);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
