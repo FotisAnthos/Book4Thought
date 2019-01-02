@@ -76,7 +76,7 @@
                     android:contentDescription="@string/save_book"
                     android:cropToPadding="true"
                     android:scaleType="centerInside"
-                    android:src="@drawable/image_save_book" />
+                    android:src="@drawable/ic_baseline_book_24px" />
 
             </LinearLayout>
 
