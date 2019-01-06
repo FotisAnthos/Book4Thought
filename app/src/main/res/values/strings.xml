@@ -56,4 +56,5 @@
     <string name="not_connected">Not Connected to the Internet!</string>
     <string name="account_info">Account Info</string>
     <string name="bookmarked_books">Bookmarked Books</string>
+    <string name="suggestions">Show Suggestions</string>
 </resources>

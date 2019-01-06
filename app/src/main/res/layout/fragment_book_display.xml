@@ -102,5 +102,11 @@
             android:layout_height="wrap_content"
             android:text="@string/read_book" />
 
+        <Button
+            android:id="@+id/suggestions_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/suggestions" />
+
     </LinearLayout>
 </ScrollView>

@@ -1,17 +1,10 @@
 package com.exams.anthopoulos.book4thought;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-
-import com.exams.anthopoulos.book4thought.DataBases.RetrieveBooksDBOperation;
-import com.exams.anthopoulos.book4thought.Fragments.DBBooks;
-import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
-
-import java.util.List;
+import android.support.v4.app.Fragment;
 
 
 public class MainActivity extends BaseActivity{
-    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,37 +13,9 @@ public class MainActivity extends BaseActivity{
         extendedSavedInstanceState.putBundle("savedInstanceState", savedInstanceState);
         super.onCreate(extendedSavedInstanceState);
 
-        try {
-            RetrieveBooksDBOperation retrieve = new RetrieveBooksDBOperation(this, new RetrieveBooksDBOperation.AsyncResponse() {
-                @Override
-                public void booksRetrieved(List<BookData> savedBooks) {
-                    booksReady(savedBooks);
-                }
-            });
-
-            retrieve.execute();
-        }catch (Exception e){
-            //Probably database not found/created
+        for (Fragment fragment:getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
-
-        //Fragment initialization - start with the MainFragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        //main fragment initialization
-        loadingFragment = new LoadingFragment();
-        // In case this activity was started with special instructions from an
-        // Intent, pass the Intent's extras to the fragment as arguments
-        loadingFragment.setArguments(getIntent().getExtras());
-        loadingFragment.show(transaction, "loadingFragment");
     }
 
-    private void booksReady(List<BookData> savedBooks) {
-        loadingFragment.dismiss();
-
-        DBBooks dbBooks = new DBBooks();
-        dbBooks.setBookList(savedBooks);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        transaction.add(R.id.fragment_container, dbBooks, "dbBooks");
-        transaction.commit();
-    }
 }
