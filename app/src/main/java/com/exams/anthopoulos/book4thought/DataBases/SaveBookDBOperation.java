@@ -47,13 +47,16 @@ public class SaveBookDBOperation implements Runnable {
         this.rating = bookData.getRating();
         this.ratingsCount = bookData.getRatingsCount();
         this.webReaderLink = bookData.getWebReaderLink();
-        try{
+        if(bookData.getCategories().size()>0){
             this.category = bookData.getCategories().get(0);
-        }catch (NullPointerException npe){this.category="";}
-        try{
+        } else {
+            this.category="";
+        }
+        if(bookData.getAuthors().size()>0){
             this.author = bookData.getAuthors().get(0);
-        }catch (NullPointerException npe){this.author = "";}
-
+        } else {
+            this.author = "";
+        }
     }
 
     @Override

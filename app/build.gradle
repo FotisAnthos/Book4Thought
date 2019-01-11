@@ -19,6 +19,8 @@ android {
     }
     buildTypes.each {
         it.buildConfigField 'String', 'GOOGLE_BOOKS_API_KEY', GOOGLE_BOOKS_API_KEY
+        it.buildConfigField 'String', 'CLIENT_ID', CLIENT_ID
+        it.buildConfigField 'String', 'GOOGLE_BOOKS', GOOGLE_BOOKS
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -39,7 +41,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.apis:google-api-services-books:v1-rev104-1.25.0'
+    // Google Play services Auth split
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
-
+    // Google Api Client library and Android extension
+    implementation 'com.google.api-client:google-api-client:1.25.0'
+    implementation 'com.google.api-client:google-api-client-android:1.22.0'
+    //Google Books api
+    implementation 'com.google.apis:google-api-services-books:v1-rev104-1.25.0'
+    implementation 'com.squareup.okhttp:okhttp:2.6.0'
 }

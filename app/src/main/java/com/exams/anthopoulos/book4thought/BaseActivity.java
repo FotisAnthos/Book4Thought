@@ -2,7 +2,6 @@ package com.exams.anthopoulos.book4thought;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -54,6 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private boolean doubleBackToExitPressedOnce = false;
     private Menu menu;
     private LoadingFragment loadingFragment;
+    private GoogleSignInOptions gso;
 
 
     @Override
@@ -78,9 +78,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()//
-                .requestProfile()
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
                 .build();
         // [END configure_signin]
@@ -96,6 +95,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null){
+            Log.i(TAG, "onStart: "+ account.getServerAuthCode());
+        }
         //update the UI accordingly
         updateUI(account);
     }
@@ -290,7 +292,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             }
         }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
@@ -363,21 +364,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
-
-    public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
-        // AUTHORITY is a unique name, but it is recommended to use the name of the
-        // package followed by the name of the class.
-        final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
-
-        // Uncomment line below, if you want to provide two lines in each suggestion:
-        // public final static int MODE = DATABASE_MODE_QUERIES | DATABASE_MODE_2LINES;
-        final static int MODE = DATABASE_MODE_QUERIES;
-
-        public SearchSuggestionProvider() {
-            setupSuggestions(AUTHORITY, MODE);
-        }
-    }
-
     private boolean isConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -387,6 +373,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             }
         }
         return false;
+    }
+
+    public GoogleSignInOptions getGSO(){
+        return this.gso;
     }
 
 }

@@ -18,16 +18,15 @@ import javax.net.ssl.HttpsURLConnection;
 public class SearchTask extends AsyncTask<String, Void, JSONObject> {
 
     private final String baseUrl;
-
-    public interface AsyncResponse {
-        void searchFinish(JSONObject output);
-    }
-
     private static final String TAG = "SearchTaskTag";
     private final String[] name = {"query", "intitle", "inauthor", "inpublisher", "subject", "isbn", "lccn", "oclc"};
     private final String[] value = new String[8];
     private int length;
     private final AsyncResponse response;
+
+    public interface AsyncResponse {
+        void searchFinish(JSONObject output);
+    }
 
     public SearchTask(String baseUrl, AsyncResponse response) {
         this.response = response;
@@ -106,6 +105,7 @@ public class SearchTask extends AsyncTask<String, Void, JSONObject> {
             {
                 stringBuffer.append(line);
             }
+            connection.disconnect();
             return new JSONObject(stringBuffer.toString());
 
         } catch (MalformedURLException e) {

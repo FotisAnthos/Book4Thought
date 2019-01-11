@@ -90,7 +90,11 @@ public class BookDataGather {
                 try{
                     thumbnailLink = volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail");
                 }catch (JSONException e){
-                    thumbnailLink = null;
+                    try{
+                        thumbnailLink = volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
+                    }catch (JSONException e1){
+                        thumbnailLink = null;
+                    }
                 }
 
                 try{
