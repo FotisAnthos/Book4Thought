@@ -9,11 +9,8 @@ import com.exams.anthopoulos.book4thought.Fragments.SearchResultsFragment;
 import com.exams.anthopoulos.book4thought.Utilities.BookDataGather;
 import com.exams.anthopoulos.book4thought.Utilities.SearchTask;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends BaseActivity implements SearchResultsFragment.OnFragmentInteractionListener {
@@ -83,4 +80,8 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
         super.onBackPressed();
     }
 
+    @Override
+    public void onRefreshRequest() {
+        return;
+    }
 }

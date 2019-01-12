@@ -53,11 +53,17 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
     protected void onStart() {
         super.onStart();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (GoogleSignIn.hasPermissions(account, new Scope("https://www.googleapis.com/auth/books"))) {
+        boolean isSignedIn = GoogleSignIn.hasPermissions(account, new Scope("https://www.googleapis.com/auth/books"));
+        updateUI(account, isSignedIn);
+    }
+
+    private void updateUI(GoogleSignInAccount account, boolean signedIn){
+        if (signedIn) {
             getSuggestions(account);
         } else {
             Toast.makeText(context, "Sign in to view personalized suggestions", Toast.LENGTH_LONG).show();
-            }
+        }
+
     }
 
     private void showSuggestions(){
@@ -83,6 +89,13 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
             }
         });
         sk.execute();
+    }
+
+    @Override
+    public void onRefreshRequest() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        boolean isSignedIn = GoogleSignIn.hasPermissions(account, new Scope("https://www.googleapis.com/auth/books"));
+        updateUI(account, isSignedIn);
     }
 
     private static class SuggestionsTask extends AsyncTask<String, Void, JSONObject>  {
@@ -118,19 +131,26 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
                 connection.setRequestProperty("User-Agent", USER_AGENT);
                 connection.setRequestProperty("authorization", "Bearer " + credential.getToken());
 
-                String responseCode = Integer.toString(connection.getResponseCode());
-                Log.i(TAG, responseCode);
+                if(connection.getResponseCode() != 200){
+                    String responseCode = Integer.toString(connection.getResponseCode());
 
-                bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    if(connection.getResponseCode() != 200){
+                        Log.i(TAG, "Connection failed: code: "+ responseCode);
+                    }
+                }else{
+                    bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-                StringBuilder stringBuffer = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null)
-                {
-                    stringBuffer.append(line);
+                    StringBuilder stringBuffer = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null)
+                    {
+                        stringBuffer.append(line);
+                    }
+                    connection.disconnect();
+                    return new JSONObject(stringBuffer.toString());
                 }
-                connection.disconnect();
-                return new JSONObject(stringBuffer.toString());
+                return null;
+
             }catch (Exception e ) {
                 Log.e(TAG, e.getMessage());
                 return null;
