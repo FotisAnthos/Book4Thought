@@ -30,7 +30,7 @@ public class SaveBookDBOperation implements Runnable {
     private final String description;
     private final Context activity;
     private final String title;
-    private String author;
+    private final String author;
     private final String canonicalLink;
     private final Bitmap thumbnail;
     private String category;

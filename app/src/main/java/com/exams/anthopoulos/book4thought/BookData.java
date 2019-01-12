@@ -16,7 +16,7 @@ public class BookData implements Parcelable {
     private final String canonicalLink;
     private String thumbnailLink;
     private Bitmap thumbnail;
-    private List<String> categories;
+    private final List<String> categories;
     private int rating;
     private int ratingsCount;
     private String webReaderLink;
@@ -111,7 +111,7 @@ public class BookData implements Parcelable {
         dest.writeString(this.webReaderLink);
     }
 
-    protected BookData(Parcel in) {
+    private BookData(Parcel in) {
         this.title = in.readString();
         this.authors = in.createStringArrayList();
         this.description = in.readString();

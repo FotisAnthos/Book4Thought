@@ -14,7 +14,7 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class RequestTask extends AsyncTask<String, Void, JSONObject> {
+class RequestTask extends AsyncTask<String, Void, JSONObject> {
     private static final String TAG = "RequestTaskTag";
     private final String requestUrl;
 

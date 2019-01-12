@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         updateUI(account, isSignedIn);
     }
 
-    protected void updateUI(GoogleSignInAccount account, boolean signedIn){
+    void updateUI(GoogleSignInAccount account, boolean signedIn){
         if(account == null) return;
         if (signedIn) {
             getSuggestions(account);
@@ -71,8 +71,9 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         searchResultsFragment.setSearchResults(suggestedBooks);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, searchResultsFragment, "suggestionsFragment");
-        transaction.commit();
+        transaction
+                .replace(R.id.fragment_container, searchResultsFragment, "suggestionsFragment")
+                .commit();
     }
 
     private void getSuggestions(GoogleSignInAccount account){
@@ -101,7 +102,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
 
     private static class SuggestionsTask extends AsyncTask<String, Void, JSONObject>  {
         private final GoogleSignInAccount account;
-        private AsyncResponse response;
+        private final AsyncResponse response;
         private WeakReference<MainActivity> mActivityRef;
 
         public interface AsyncResponse {

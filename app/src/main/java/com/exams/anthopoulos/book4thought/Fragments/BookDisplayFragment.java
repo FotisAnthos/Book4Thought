@@ -154,6 +154,7 @@ public class BookDisplayFragment extends Fragment {
     }
 
     private void showSuggestions() {
+
         /*
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         StringBuilder urlString = new StringBuilder();
@@ -192,7 +193,7 @@ public class BookDisplayFragment extends Fragment {
         });
         request.execute();
         */
-
+        return;
     }
 
     private void booksReady(List<BookData> savedBooks){
