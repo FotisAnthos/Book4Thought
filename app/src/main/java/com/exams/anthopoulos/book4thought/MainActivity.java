@@ -43,11 +43,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         super.child(this);
         this.context = this;
 
-        //View initialization, show loading Fragment until results are ready to display
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        MainFragment mainFragment = new MainFragment();
-        transaction.add(R.id.fragment_container, mainFragment, "mainFragment");
-        transaction.commit();
+
     }
 
     @Override
@@ -58,11 +54,15 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         updateUI(account, isSignedIn);
     }
 
-    protected void updateUI(GoogleSignInAccount account, boolean signedIn){
-        if(account == null) return;
+    void updateUI(GoogleSignInAccount account, boolean signedIn){
         if (signedIn) {
+            if(account == null) return;
             getSuggestions(account);
         } else {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            MainFragment mainFragment = new MainFragment();
+            transaction.add(R.id.fragment_container, mainFragment, "mainFragment");
+            transaction.commit();
             Toast.makeText(context, "Sign in to view personalized suggestions", Toast.LENGTH_LONG).show();
         }
     }
@@ -71,8 +71,9 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         searchResultsFragment.setSearchResults(suggestedBooks);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, searchResultsFragment, "suggestionsFragment");
-        transaction.commit();
+        transaction
+                .replace(R.id.fragment_container, searchResultsFragment, "suggestionsFragment")
+                .commit();
     }
 
     private void getSuggestions(GoogleSignInAccount account){
@@ -101,7 +102,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
 
     private static class SuggestionsTask extends AsyncTask<String, Void, JSONObject>  {
         private final GoogleSignInAccount account;
-        private AsyncResponse response;
+        private final AsyncResponse response;
         private WeakReference<MainActivity> mActivityRef;
 
         public interface AsyncResponse {

@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.exams.anthopoulos.book4thought.DataBases.RetrieveBooksDBOperation;
 import com.exams.anthopoulos.book4thought.Fragments.DBBooks;
 import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
-import com.exams.anthopoulos.book4thought.Fragments.MainFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -53,8 +52,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private boolean doubleBackToExitPressedOnce = false;
     private Menu menu;
     private LoadingFragment loadingFragment;
-    private GoogleSignInOptions gso;
-    private MainActivity child;
+    private MainActivity child; //if the current Activity is not MainActivity, this will be null
 
 
     @Override
@@ -78,7 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
                 .build();
@@ -284,12 +282,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                     DBBooks dbBooks = new DBBooks();
                     dbBooks.setBookList(savedBooks);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    Fragment previousFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-                    for (Fragment fragment:getSupportFragmentManager().getFragments()) {
-                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-                    }
-                    transaction.add(R.id.fragment_container, dbBooks, "dbBooks");
-                    transaction.commit();
+                    transaction
+                            .replace(R.id.fragment_container, dbBooks, "dbBooks")
+                            .addToBackStack(previousFragment.getTag())
+                            .commit();
                 }
             });
 
@@ -340,7 +338,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         SearchView searchItem = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("MainFragment");
 
         //if the drawer is open, close it
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -349,7 +346,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             searchItem.onActionViewCollapsed();
         }
         //else if the current fragment is the "MainFragment"
-        else if (mainFragment != null && mainFragment.isVisible()) {
+        else if (child != null) {
             if (doubleBackToExitPressedOnce) {
                 //if back button has already been pressed once
                 super.onBackPressed();
@@ -382,7 +379,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         return false;
     }
 
-    protected void child(MainActivity mainActivity) {
+    void child(MainActivity mainActivity) {
         this.child = mainActivity;
     }
 }
