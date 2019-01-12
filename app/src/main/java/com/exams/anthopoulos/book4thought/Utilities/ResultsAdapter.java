@@ -95,7 +95,9 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ResultsV
         }else {//display book info
             final BookData bookData = bookList.get(position);
             holder.title.setText(bookData.getTitle());
-            holder.author.setText(bookData.getAuthors().get(0));//just the first one for this view
+            if(bookData.getAuthors().size() > 0){
+                holder.author.setText(bookData.getAuthors().get(0));//just the first one for this view
+            }
 
             if (bookData.getThumbnailLink() != null) {
                 Picasso.get().cancelRequest(holder.thumbnail);
