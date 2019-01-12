@@ -43,11 +43,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         super.child(this);
         this.context = this;
 
-        //View initialization, show loading Fragment until results are ready to display
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        MainFragment mainFragment = new MainFragment();
-        transaction.add(R.id.fragment_container, mainFragment, "mainFragment");
-        transaction.commit();
+
     }
 
     @Override
@@ -59,10 +55,14 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
     }
 
     void updateUI(GoogleSignInAccount account, boolean signedIn){
-        if(account == null) return;
         if (signedIn) {
+            if(account == null) return;
             getSuggestions(account);
         } else {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            MainFragment mainFragment = new MainFragment();
+            transaction.add(R.id.fragment_container, mainFragment, "mainFragment");
+            transaction.commit();
             Toast.makeText(context, "Sign in to view personalized suggestions", Toast.LENGTH_LONG).show();
         }
     }
