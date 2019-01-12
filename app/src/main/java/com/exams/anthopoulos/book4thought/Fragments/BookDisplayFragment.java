@@ -3,11 +3,13 @@ package com.exams.anthopoulos.book4thought.Fragments;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +74,14 @@ public class BookDisplayFragment extends Fragment {
 
         title.setText(bookData.getTitle());
 
-        StringBuilder tmpAuthors = new StringBuilder(bookData.getAuthors().get(0));
+        if(bookData.getAuthors().size()>0){
+            StringBuilder tmpAuthors = new StringBuilder(bookData.getAuthors().get(0));
+
+            for (int i = 1; i < bookData.getAuthors().size(); i++) {
+                tmpAuthors.append(", ").append(bookData.getAuthors().get(i));
+            }
+            authors.setText(tmpAuthors.toString());
+        }
 
         ratingBar.setRating(bookData.getRating() + 1);
 
@@ -86,12 +95,11 @@ public class BookDisplayFragment extends Fragment {
             }
         });
 
-        for (int i = 1; i < bookData.getAuthors().size(); i++) {
-            tmpAuthors.append(", ").append(bookData.getAuthors().get(i));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            description.setText(Html.fromHtml(bookData.getDescription(), Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            description.setText(Html.fromHtml(bookData.getDescription()));
         }
-        authors.setText(tmpAuthors.toString());
-
-        description.setText(bookData.getDescription());
 
         openInGooglePlayBookButton.setOnClickListener(new View.OnClickListener() {
             @Override

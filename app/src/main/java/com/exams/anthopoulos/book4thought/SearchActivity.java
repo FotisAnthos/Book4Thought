@@ -16,7 +16,7 @@ import java.util.List;
 public class SearchActivity extends BaseActivity implements SearchResultsFragment.OnFragmentInteractionListener {
     private static final String TAG = "SearchActivityTag";
     private static final int RESULTS_LIMIT = 50;
-    private JSONObject searchResults;
+    private BookDataGather gather;
 
     private LoadingFragment loadingFragment;
 
@@ -48,16 +48,20 @@ public class SearchActivity extends BaseActivity implements SearchResultsFragmen
         } catch (NullPointerException npe) {
             Log.w(TAG, npe.getMessage());
         }
+        if(gather == null || gather.getBooksList() == null){
+            SearchTask searchTask = new SearchTask(getString(R.string.google_Books_API), new SearchTask.AsyncResponse() {
+                @Override
+                public void searchFinish(JSONObject output) {
+                    gather = new BookDataGather(output, RESULTS_LIMIT);
+                    displayResults(gather.dataGather());
+                }
+            });
+            searchTask.execute(query);
+        }
+        else{
+            displayResults(gather.getBooksList());
+        }
 
-        SearchTask searchTask = new SearchTask(getString(R.string.google_Books_API), new SearchTask.AsyncResponse() {
-            @Override
-            public void searchFinish(JSONObject output) {
-                searchResults = output;
-                BookDataGather gather = new BookDataGather(searchResults, RESULTS_LIMIT);
-                displayResults(gather.dataGather());
-            }
-        });
-        searchTask.execute(query);
     }
 
 

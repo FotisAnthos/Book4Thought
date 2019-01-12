@@ -20,6 +20,10 @@ public class BookDataGather {
         this.resultsLimit = resultsLimit;
     }
 
+    public ArrayList<BookData> getBooksList() {
+        return booksList;
+    }
+
     public ArrayList<BookData> dataGather(){
         booksList = new ArrayList<>();
         try {

@@ -54,6 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private Menu menu;
     private LoadingFragment loadingFragment;
     private GoogleSignInOptions gso;
+    private MainActivity child;
 
 
     @Override
@@ -62,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         Bundle savedInstanceStateDefault = savedInstanceState.getBundle("savedInstanceState");
         setContentView(layoutCode);
         super.onCreate(savedInstanceStateDefault);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -127,6 +127,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             Log.w(TAG, "Sign in - success");
             updateUI(account);
+            if(child != null){
+                boolean isSignedIn = GoogleSignIn.hasPermissions(account, new Scope("https://www.googleapis.com/auth/books"));
+                child.updateUI(account, isSignedIn);
+            }
         } catch (ApiException e) {
             switch (e.getStatusCode()) {
                 //https://github.com/googlesamples/google-services/issues/374
@@ -160,6 +164,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                         updateUI(null);
                     }
                 });
+        if(child != null){
+            child.updateUI(null, false);
+        }
     }
 
     private void revokeAccessGoogle() {
@@ -174,6 +181,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                         updateUI(null);
                     }
                 });
+        if(child != null){
+            child.updateUI(null, false);
+        }
     }
 
     private void updateUI(GoogleSignInAccount account) {
@@ -372,9 +382,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         return false;
     }
 
-    public GoogleSignInOptions getGSO(){
-        return this.gso;
+    protected void child(MainActivity mainActivity) {
+        this.child = mainActivity;
     }
-
 }
 

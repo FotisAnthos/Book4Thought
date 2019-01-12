@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         extendedSavedInstanceState.putInt("layout", R.layout.activity_base);
         extendedSavedInstanceState.putBundle("savedInstanceState", savedInstanceState);
         super.onCreate(extendedSavedInstanceState);
+        super.child(this);
         this.context = this;
 
         //View initialization, show loading Fragment until results are ready to display
@@ -57,13 +58,13 @@ public class MainActivity extends BaseActivity implements SearchResultsFragment.
         updateUI(account, isSignedIn);
     }
 
-    private void updateUI(GoogleSignInAccount account, boolean signedIn){
+    protected void updateUI(GoogleSignInAccount account, boolean signedIn){
+        if(account == null) return;
         if (signedIn) {
             getSuggestions(account);
         } else {
             Toast.makeText(context, "Sign in to view personalized suggestions", Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void showSuggestions(){
