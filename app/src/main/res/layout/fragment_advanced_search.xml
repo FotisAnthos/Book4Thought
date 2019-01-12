@@ -16,58 +16,12 @@
         android:background="@drawable/background_container"
         android:orientation="vertical">
 
-        <TableLayout
+
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical|fill_vertical|center_horizontal|center">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center"
-                    android:text="@string/advanced_search"
-                    android:textAllCaps="true"
-                    android:textSize="24sp" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <TextView
-                    android:layout_width="43dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/search_for" />
-
-                <EditText
-                    android:id="@+id/adv_search_query"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:hint="@string/search_hint"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
-                    android:textSize="12sp"
-                    tools:targetApi="o" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </TableLayout>
-
-
-
+            android:layout_height="match_parent"
+            android:contentDescription="@string/who_did_dis"
+            android:src="@drawable/advanced_search" />
     </LinearLayout>
 </ScrollView>

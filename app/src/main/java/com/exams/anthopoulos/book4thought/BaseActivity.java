@@ -2,7 +2,6 @@ package com.exams.anthopoulos.book4thought;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -26,6 +26,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exams.anthopoulos.book4thought.DataBases.RetrieveBooksDBOperation;
+import com.exams.anthopoulos.book4thought.Fragments.DBBooks;
 import com.exams.anthopoulos.book4thought.Fragments.LoadingFragment;
 import com.exams.anthopoulos.book4thought.Fragments.MainFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -39,6 +41,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
 import java.util.Objects;
 
 public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,6 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     private boolean doubleBackToExitPressedOnce = false;
     private Menu menu;
     private LoadingFragment loadingFragment;
+    private GoogleSignInOptions gso;
 
 
     @Override
@@ -74,9 +78,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()//
-                .requestProfile()
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/books"))
                 .build();
         // [END configure_signin]
@@ -92,6 +95,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null){
+            Log.i(TAG, "onStart: "+ account.getServerAuthCode());
+        }
         //update the UI accordingly
         updateUI(account);
     }
@@ -254,12 +260,37 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             revokeAccessGoogle();
         } else if (id == R.id.nav_manage) {
             startActivity(new Intent(this, LoginActivity.class));
+        } else if (id == R.id.nav_saved_books) {
+            showSavedBooks();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void showSavedBooks(){
+        try {
+            RetrieveBooksDBOperation retrieve = new RetrieveBooksDBOperation(this, new RetrieveBooksDBOperation.AsyncResponse() {
+                @Override
+                public void booksRetrieved(List<BookData> savedBooks) {
+                    DBBooks dbBooks = new DBBooks();
+                    dbBooks.setBookList(savedBooks);
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                    for (Fragment fragment:getSupportFragmentManager().getFragments()) {
+                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                    }
+                    transaction.add(R.id.fragment_container, dbBooks, "dbBooks");
+                    transaction.commit();
+                }
+            });
+
+            retrieve.execute();
+        }catch (Exception e) {
+            //Probably database not found/created TODO
+            }
+        }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -333,21 +364,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
-
-    public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
-        // AUTHORITY is a unique name, but it is recommended to use the name of the
-        // package followed by the name of the class.
-        final static String AUTHORITY = "com.exams.anthopoulos.book4thought.SearchSuggestionProvider";
-
-        // Uncomment line below, if you want to provide two lines in each suggestion:
-        // public final static int MODE = DATABASE_MODE_QUERIES | DATABASE_MODE_2LINES;
-        final static int MODE = DATABASE_MODE_QUERIES;
-
-        public SearchSuggestionProvider() {
-            setupSuggestions(AUTHORITY, MODE);
-        }
-    }
-
     private boolean isConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -357,6 +373,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             }
         }
         return false;
+    }
+
+    public GoogleSignInOptions getGSO(){
+        return this.gso;
     }
 
 }

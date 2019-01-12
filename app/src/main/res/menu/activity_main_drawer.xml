@@ -12,6 +12,14 @@
             android:title="@string/action_sign_in"
             android:visible="false" />
         <item
+            android:id="@+id/nav_saved_books"
+            android:icon="@drawable/ic_baseline_book_24px"
+            android:title="@string/bookmarked_books" />
+        <item
+            android:id="@+id/nav_account_info"
+            android:icon="@drawable/ic_baseline_account_circle_24px"
+            android:title="@string/account_info" />
+        <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/action_settings" />
