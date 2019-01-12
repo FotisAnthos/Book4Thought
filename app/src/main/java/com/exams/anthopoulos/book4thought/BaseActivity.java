@@ -95,9 +95,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account != null){
-            Log.i(TAG, "onStart: "+ account.getServerAuthCode());
-        }
         //update the UI accordingly
         updateUI(account);
     }
@@ -207,7 +204,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             }
 
             /*
-            if(profilePicture != null){//if the profilePicture is readily available
+            if(profilePicture != null){
                 profileImage.setImageBitmap(profilePicture);
                 profileImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             }

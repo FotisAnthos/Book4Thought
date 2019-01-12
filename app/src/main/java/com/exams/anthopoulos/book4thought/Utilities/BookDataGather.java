@@ -1,7 +1,5 @@
 package com.exams.anthopoulos.book4thought.Utilities;
 
-import android.util.Log;
-
 import com.exams.anthopoulos.book4thought.BookData;
 
 import org.json.JSONArray;
@@ -43,7 +41,6 @@ public class BookDataGather {
                     title = volumeInfo.getString("title");
                 }catch (JSONException e){
                     title = "";
-                    Log.i(TAG, e.getMessage());
                 }
                 //Book Authors
                 ArrayList<String> authors = new ArrayList<>();
@@ -53,7 +50,7 @@ public class BookDataGather {
                         authors.add(jsAuthors.getString(authorIndex));
                     }
                 }catch (JSONException e){
-                    Log.i(TAG, e.getMessage());
+                    //do nothing
                 }
                 //Book categories
                 ArrayList<String> bookCategories = new ArrayList<>();
@@ -63,28 +60,25 @@ public class BookDataGather {
                         bookCategories.add(jBookCategories.getString(catIndex));
                     }
                 }catch (JSONException e){
-                    Log.i(TAG, e.getMessage());
+                    //do nothing
                 }
                 //Book rating
                 try{
                     rating = volumeInfo.getInt("averageRating");
                 }catch (JSONException e){
                     rating = 0;
-                    Log.i(TAG, e.getMessage());
                 }
                 //Book ratings count
                 try{
                     ratingsCount = volumeInfo.getInt("ratingsCount");
                 }catch (JSONException e){
                     ratingsCount = 0;
-                    Log.i(TAG, e.getMessage());
                 }
                 //Book description
                 try{
                     description = volumeInfo.getString("description");
                 }catch (JSONException e){
                     description = "";
-                    Log.i(TAG, e.getMessage());
                 }
                 //Book Thumbnail
                 try{

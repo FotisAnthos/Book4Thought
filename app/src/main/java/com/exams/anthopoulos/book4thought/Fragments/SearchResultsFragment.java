@@ -62,6 +62,7 @@ public class SearchResultsFragment extends Fragment {
             public void onRefresh() {
                 // This method performs the actual data-refresh operation.
                 // The method calls setRefreshing(false) when it's finished.
+                mListener.onRefreshRequest();
                 mAdapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -88,5 +89,6 @@ public class SearchResultsFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
+        void onRefreshRequest();
     }
 }
